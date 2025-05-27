@@ -1,34 +1,46 @@
 package com.caremyhome.controller;
 
-import com.caremyhome.model.MaintenanceRequest;
-import com.caremyhome.service.MaintenanceService;
+import jakarta.transaction.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/maintenance")
 public class MaintenanceController {
 
-    private final MaintenanceService service;
+    private final MaintenanceRequestRepository maintenanceRequestRepository;
 
-    public MaintenanceController(MaintenanceService service) {
-        this.service = service;
+    public MaintenanceController(MaintenanceRequestRepository repo) {
+        this.maintenanceRequestRepository = repo;
     }
 
-    @GetMapping
-    public List<MaintenanceRequest> getAll() {
-        return service.findAll();
+    @GetMapping("/{propertyId}")
+    public List<MaintenanceRequest> getAll(@PathVariable Optional<String> propertyId) {
+        if (propertyId.isPresent() && !propertyId.get().isEmpty()) {
+            return maintenanceRequestRepository.findByPropertyId(propertyId.get());
+        }
+        return maintenanceRequestRepository.findAll();
     }
 
     @PostMapping
-    public MaintenanceRequest create(@RequestBody MaintenanceRequest entity) {
-        return service.save(entity);
+    public MaintenanceRequest create(@RequestBody MaintenanceRequest request) {
+        request.setCreatedAt(new Date());
+        request.setStatus("Pending");
+        return maintenanceRequestRepository.save(request);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        service.delete(id);
+    @PatchMapping("/{id}/status")
+    @Transactional
+    public void updateStatus(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
+        maintenanceRequestRepository.findById(id).ifPresent(req -> req.setStatus(payload.get("status")));
+    }
+
+    @PostMapping("/{id}/comment")
+    @Transactional
+    public void addComment(@PathVariable UUID id, @RequestBody Map<String, String> comment) {
+        maintenanceRequestRepository.findById(id).ifPresent(req -> {
+            req.getComments().add(new MaintenanceComment(comment.get("from"), comment.get("text")));
+        });
     }
 }

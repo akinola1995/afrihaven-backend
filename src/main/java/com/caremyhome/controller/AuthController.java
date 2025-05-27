@@ -1,26 +1,28 @@
+// src/main/java/com/caremyhome/controller/AuthController.java
 package com.caremyhome.controller;
 
+import com.caremyhome.dto.AuthRequest;
+import com.caremyhome.dto.AuthResponse;
 import com.caremyhome.model.User;
-import com.caremyhome.service.UserService;
+import com.caremyhome.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final UserService service;
+    @Autowired
+    private UserRepository userRepository;
 
-    public AuthController(UserService service) {
-        this.service = service;
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
+        if (user != null) {
+            return new AuthResponse(user.getEmail(), user.getRole().toString(), "success");
+        } else {
+            return new AuthResponse(null, null, "failure");
+        }
     }
-    
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        service.save(user);
-        return ResponseEntity.ok("User registered successfully.");
-    }
-
 }

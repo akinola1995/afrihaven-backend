@@ -13,6 +13,15 @@ public class Document {
     private String url;
     private String description;
 
+    private LocalDateTime uploadedAt;
+
+    @PrePersist
+    public void setTimestamp() {
+        this.uploadedAt = LocalDateTime.now();
+    }
+
+    private String filePath;
+
     @ManyToOne
     private User uploadedBy;
 

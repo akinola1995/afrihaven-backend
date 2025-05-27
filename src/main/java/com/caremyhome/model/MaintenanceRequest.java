@@ -6,20 +6,30 @@ import java.util.UUID;
 
 @Entity
 public class MaintenanceRequest {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String tenant;
+    private String tenantName;
+    private String tenantEmail;
+    private String property;
     private String issue;
-    private String status; // Pending, Resolved
-    private String urgency; // Optional: Low, Medium, High
-    private LocalDate createdAt;
+    private String urgency;
+    private String status;
 
-    @ManyToOne
-    private Property property;
+    private LocalDateTime createdAt;
 
-    @ManyToOne
-    private User createdBy;
+    @ElementCollection
+    @CollectionTable(name = "maintenance_comments", joinColumns = @JoinColumn(name = "request_id"))
+    private List<Comment> comments = new ArrayList<>();
 
-    // Getters and setters
+    @PrePersist
+    public void init() {
+        this.createdAt = LocalDateTime.now();
+        this.status = "Pending";
+    }
+
+    // Getters and Setters
 }

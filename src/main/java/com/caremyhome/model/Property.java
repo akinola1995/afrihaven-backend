@@ -14,6 +14,21 @@ public class Property {
     private String type; // RENT, SALE, SHORTLET, VACATION
     private String state;
     private String city;
+    private String propertyType;
+    private int price;
+    private int bedrooms;
+    private String country;
+    private String imageUrl;
+
+    private String videoUrl;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 
     @ManyToOne
     private User owner;
