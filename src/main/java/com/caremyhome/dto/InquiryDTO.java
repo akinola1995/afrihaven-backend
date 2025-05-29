@@ -17,7 +17,7 @@ public class InquiryDTO {
         return new InquiryDTO(
                 inquiry.getProperty().getTitle(),
                 inquiry.getStatus(),
-                inquiry.getSubmittedAt().toString()
+                inquiry.getCreatedAt().toString()
         );
 
     }

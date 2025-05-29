@@ -49,7 +49,7 @@ public class OwnerService {
                 .map(InquiryDTO::fromEntity)
                 .collect(Collectors.toList());
 
-        List<TenantAssignment> tenantAssignments = tenantAssignmentRepository.findByOwnerId(owner.getId());
+        List<TenantAssignment> tenantAssignments = tenantAssignmentRepository.findByOwner_Id(owner.getId());
         List<RentPayment> rentUploads = rentPaymentRepository.findByOwner(owner.getId());
         List<UnassignmentRequest> unassignmentRequests = unassignmentRequestRepository.findByOwner(owner.getId());
 

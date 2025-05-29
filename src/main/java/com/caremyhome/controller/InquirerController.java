@@ -26,7 +26,7 @@ public class InquirerController {
                 .map(inq -> new InquiryDTO(
                         inq.getProperty().getTitle(),
                         inq.getStatus(),
-                        inq.getSubmittedAt().toString()
+                        inq.getCreatedAt().toString()
                 ))
                 .collect(Collectors.toList());
     }

@@ -50,14 +50,14 @@ public class DashboardController {
                 data.put("maintenanceRequests", maintenanceRequestRepository.countByStatusNot("Resolved"));
             }
             case "BUYER" -> {
-                data.put("savedListings", propertyRepository.countSavedListings());
+                data.put("savedListings", propertyRepository.countBySavedTrue());
             }
             case "RENTER" -> {
                 data.put("activeApplications", inquiryRepository.countActiveRentalApplications());
             }
             case "ADMIN" -> {
                 data.put("totalUsers", userRepository.count());
-                data.put("reportedListings", propertyRepository.countReported());
+                data.put("reportedListings", propertyRepository.countByReportedTrue());
                 data.put("totalProperties", propertyRepository.count());
             }
             default -> data.put("message", "Unknown role");

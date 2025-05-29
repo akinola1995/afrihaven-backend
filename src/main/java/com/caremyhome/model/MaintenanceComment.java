@@ -1,5 +1,6 @@
 package com.caremyhome.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
@@ -13,7 +14,9 @@ import java.util.Date;
 @AllArgsConstructor
 public class MaintenanceComment {
 
-    private String from;
+    @Column(name = "from_user")
+    private String fromUser;
+
     private String text;
     private Date date = new Date();
     private LocalDateTime timestamp = LocalDateTime.now();

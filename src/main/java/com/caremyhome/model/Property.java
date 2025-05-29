@@ -30,6 +30,8 @@ public class Property {
     private String unit;
     private Double rent;
     private LocalDate nextDueDate;
+    private boolean reported = false;
+    private boolean saved = false;
 
     private String videoUrl;
 
@@ -43,6 +45,9 @@ public class Property {
 
     @ManyToOne
     private User owner;
+
+    @ManyToOne
+    private User agent;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
     private List<MaintenanceRequest> maintenanceRequests = new ArrayList<>();

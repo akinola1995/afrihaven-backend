@@ -1,6 +1,7 @@
 package com.caremyhome.dto;
 
 import com.caremyhome.model.MaintenanceRequest;
+import com.caremyhome.model.Property;
 import lombok.Data;
 
 @Data
@@ -10,11 +11,11 @@ public class MaintenanceDTO {
     private String date;
     private String propertyTitle;
 
-    public MaintenanceDTO(String issue, String status, String date, String propertyTitle) {
+    public MaintenanceDTO(String issue, String status, String date, Property propertyTitle) {
         this.issue = issue;
         this.status = status;
         this.date = date;
-        this.propertyTitle = propertyTitle;
+        this.propertyTitle = String.valueOf(propertyTitle);
     }
 
     public static MaintenanceDTO fromEntity(MaintenanceRequest request) {

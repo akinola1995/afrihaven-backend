@@ -10,11 +10,13 @@ import java.util.UUID;
 public interface MaintenanceRequestRepository extends JpaRepository<MaintenanceRequest, UUID> {
 //    List<MaintenanceRequest> findByTenantEmail(String email);
 
-    List<MaintenanceRequest> findByPropertyId(UUID propertyId);
-    List<MaintenanceRequest> findByAgentEmail(String email);
+    //List<MaintenanceRequest> findByPropertyId(UUID propertyId);
+    List<MaintenanceRequest> findByAgent_Email(String email);
 
     List<MaintenanceRequest> findByPropertyIn(List<Property> properties);
 
-    List<MaintenanceRequest> findByPropertyId(String propertyId);
+    List<MaintenanceRequest> findByProperty_Id(UUID propertyId);
+
+   // List<MaintenanceRequest> findByPropertyId(String propertyId);
     long countByStatusNot(String status);
 }

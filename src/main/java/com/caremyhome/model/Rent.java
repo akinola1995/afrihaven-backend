@@ -16,6 +16,7 @@ public class Rent {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String tenantEmail;
     private String tenant;
 
     private double amount;

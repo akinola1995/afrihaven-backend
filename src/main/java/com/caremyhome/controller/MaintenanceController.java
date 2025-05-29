@@ -24,7 +24,7 @@ public class MaintenanceController {
     public ResponseEntity<List<MaintenanceRequest>> getAll(@PathVariable Optional<UUID> propertyId) {
         List<MaintenanceRequest> result;
         if (propertyId.isPresent()) {
-            result = maintenanceRequestRepository.findByPropertyId(propertyId.get());
+            result = maintenanceRequestRepository.findByProperty_Id(propertyId.get());
         } else {
             result = maintenanceRequestRepository.findAll();
         }

@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue
@@ -21,6 +22,7 @@ public class User {
     private String fullName;
     private String email;
     private String password;
+    private String registeredBy;
 
     public String getAvatarUrl() {
         return avatarUrl;

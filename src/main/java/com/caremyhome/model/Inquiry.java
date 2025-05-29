@@ -14,6 +14,10 @@ public class Inquiry {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "agent_id")
+    private User agent;
+
     private String message;
 
     private String email;
@@ -21,6 +25,8 @@ public class Inquiry {
     private String status;
 
     private LocalDateTime createdAt;
+
+
 
     @ManyToOne
     private Property property;
@@ -34,12 +40,12 @@ public class Inquiry {
     private String name;
     private String phone;
 
-    private LocalDateTime submittedAt;
-
-
-    @PrePersist
-    public void onCreate() {
-        this.submittedAt = LocalDateTime.now();
-    }
+//    private LocalDateTime submittedAt;
+//
+//
+//    @PrePersist
+//    public void onCreate() {
+//        this.submittedAt = LocalDateTime.now();
+//    }
 
 }

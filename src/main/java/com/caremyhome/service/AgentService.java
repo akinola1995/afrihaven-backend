@@ -23,12 +23,12 @@ public class AgentService {
 
     public Map<String, Object> getAgentDashboard(String email) {
         Map<String, Object> data = new HashMap<>();
-        List<Property> properties = propertyRepo.findByAgentEmail(email);
+        List<Property> properties = propertyRepo.findByAgent_Email(email);
         data.put("properties", properties);
         data.put("assignedTenants", assignmentRepo.findActiveByAgentEmail(email));
         data.put("assignmentHistory", assignmentRepo.findHistoryByAgentEmail(email));
-        data.put("inquiries", inquiryRepo.findByAgentEmail(email));
-        data.put("maintenance", maintenanceRepo.findByAgentEmail(email));
+        data.put("inquiries", inquiryRepo.findByAgent_Email(email));
+        data.put("maintenance", maintenanceRepo.findByAgent_Email(email));
         data.put("agentList", agentRepo.findByRegisteredBy(email));
         return data;
     }

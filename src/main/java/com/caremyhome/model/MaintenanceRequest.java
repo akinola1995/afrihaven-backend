@@ -24,10 +24,14 @@ public class MaintenanceRequest {
     private String tenant;
     private String tenantName;
     private String tenantEmail;
-    private String property;
+    @ManyToOne
+    @JoinColumn(name = "property_id")
+    private Property property;
     private String issue;
     private String urgency;
     private String status;
+    @ManyToOne
+    private User agent;
 
 
     private LocalDateTime createdAt;
