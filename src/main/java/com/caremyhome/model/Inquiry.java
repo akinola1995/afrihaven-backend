@@ -3,7 +3,11 @@ package com.caremyhome.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 public class Inquiry {
     @Id
@@ -13,6 +17,8 @@ public class Inquiry {
     private String message;
 
     private String email;
+
+    private String status;
 
     private LocalDateTime createdAt;
 

@@ -1,10 +1,20 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import lombok.*;
+
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MaintenanceRequest {
 
     @Id
@@ -19,11 +29,12 @@ public class MaintenanceRequest {
     private String urgency;
     private String status;
 
+
     private LocalDateTime createdAt;
 
     @ElementCollection
     @CollectionTable(name = "maintenance_comments", joinColumns = @JoinColumn(name = "request_id"))
-    private List<Comment> comments = new ArrayList<>();
+    private List<MaintenanceComment> comments = new ArrayList<>();
 
     @PrePersist
     public void init() {

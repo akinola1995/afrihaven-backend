@@ -1,8 +1,13 @@
 package com.caremyhome.controller;
 
+import com.caremyhome.model.MaintenanceComment;
+import com.caremyhome.model.MaintenanceRequest;
+import com.caremyhome.repository.MaintenanceRequestRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -16,31 +21,37 @@ public class MaintenanceController {
     }
 
     @GetMapping("/{propertyId}")
-    public List<MaintenanceRequest> getAll(@PathVariable Optional<String> propertyId) {
-        if (propertyId.isPresent() && !propertyId.get().isEmpty()) {
-            return maintenanceRequestRepository.findByPropertyId(propertyId.get());
+    public ResponseEntity<List<MaintenanceRequest>> getAll(@PathVariable Optional<UUID> propertyId) {
+        List<MaintenanceRequest> result;
+        if (propertyId.isPresent()) {
+            result = maintenanceRequestRepository.findByPropertyId(propertyId.get());
+        } else {
+            result = maintenanceRequestRepository.findAll();
         }
-        return maintenanceRequestRepository.findAll();
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping
-    public MaintenanceRequest create(@RequestBody MaintenanceRequest request) {
-        request.setCreatedAt(new Date());
+    public ResponseEntity<MaintenanceRequest> create(@RequestBody MaintenanceRequest request) {
+        request.setCreatedAt(LocalDateTime.now());
         request.setStatus("Pending");
-        return maintenanceRequestRepository.save(request);
+        MaintenanceRequest saved = maintenanceRequestRepository.save(request);
+        return ResponseEntity.ok(saved);
     }
 
     @PatchMapping("/{id}/status")
     @Transactional
-    public void updateStatus(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<Void> updateStatus(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
         maintenanceRequestRepository.findById(id).ifPresent(req -> req.setStatus(payload.get("status")));
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/comment")
     @Transactional
-    public void addComment(@PathVariable UUID id, @RequestBody Map<String, String> comment) {
+    public ResponseEntity<Void> addComment(@PathVariable UUID id, @RequestBody Map<String, String> comment) {
         maintenanceRequestRepository.findById(id).ifPresent(req -> {
             req.getComments().add(new MaintenanceComment(comment.get("from"), comment.get("text")));
         });
+        return ResponseEntity.ok().build();
     }
 }

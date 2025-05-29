@@ -2,12 +2,18 @@ package com.caremyhome.controller;
 
 import com.caremyhome.dto.TenantAssignmentDto;
 import com.caremyhome.service.AgentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agent")
 public class AgentDashboardController {
 
-    @Autowired private AgentService agentService;
+    @Autowired
+    private AgentService agentService;
 
     @GetMapping("/{email}/dashboard")
     public ResponseEntity<Map<String, Object>> getDashboard(@PathVariable String email) {

@@ -1,5 +1,11 @@
 package com.caremyhome.dto;
 
+import com.caremyhome.model.Rent;
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.UUID;
+@Data
 public class RentDTO {
     private UUID id;
     private String tenant;

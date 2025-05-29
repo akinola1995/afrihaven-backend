@@ -1,5 +1,13 @@
 package com.caremyhome.dto;
 
+import com.caremyhome.model.MaintenanceRequest;
+import com.caremyhome.model.Property;
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.UUID;
+import java.util.List;
+
 @Data
 public class TenantDTO {
     private String name;
@@ -13,7 +21,7 @@ public class TenantDTO {
         private String title;
         private String location;
         private String unit;
-        private int rent;
+        private Double rent;
         private LocalDate dueDate;
 
         public PropertyDTO(Property property) {

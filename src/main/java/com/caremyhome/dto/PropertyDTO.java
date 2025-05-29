@@ -1,6 +1,7 @@
 package com.caremyhome.dto;
 
 
+import lombok.Data;
 
 @Data
 public class PropertyDTO {
@@ -11,7 +12,7 @@ public class PropertyDTO {
     private String state;
     private String city;
     private String country;
-    private double price;
+    private int price;
     private int bedrooms;
     private String imageUrl;
     private String ownerEmail; // passed from frontend

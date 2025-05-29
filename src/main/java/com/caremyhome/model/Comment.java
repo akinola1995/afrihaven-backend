@@ -2,7 +2,11 @@ package com.caremyhome.model;
 
 import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Embeddable
 public class Comment {
     private String from;

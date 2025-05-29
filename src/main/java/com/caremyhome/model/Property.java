@@ -1,8 +1,16 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class Property {
     @Id
@@ -19,6 +27,9 @@ public class Property {
     private int bedrooms;
     private String country;
     private String imageUrl;
+    private String unit;
+    private Double rent;
+    private LocalDate nextDueDate;
 
     private String videoUrl;
 

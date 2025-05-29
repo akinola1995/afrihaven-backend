@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface DocumentRepository extends JpaRepository<Document, UUID> {
     List<Document> findByProperty(Property property);
+
+    List<Document> findByPropertyId(UUID propertyId);
 }

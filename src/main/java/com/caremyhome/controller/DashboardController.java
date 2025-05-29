@@ -2,8 +2,9 @@ package com.caremyhome.controller;
 
 // src/main/java/com/caremyhome/controller/DashboardController.java
 
+import com.caremyhome.model.User;
 import com.caremyhome.repository.*;
-import com.caremyhome.model.enums.Role;
+//import com.caremyhome.model.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class DashboardController {
     private MaintenanceRequestRepository maintenanceRequestRepository;
 
     @Autowired
-    private RentStatusRepository rentStatusRepository;
+    private RentRepository rentStatusRepository;
 
     @GetMapping("/{role}")
     public Map<String, Object> getDashboardData(@PathVariable String role) {
@@ -36,13 +37,13 @@ public class DashboardController {
         switch (role) {
             case "OWNER" -> {
                 data.put("totalProperties", propertyRepository.count());
-                data.put("totalTenants", userRepository.countByRole(Role.TENANT));
+                data.put("totalTenants", userRepository.countByRole(User.Role.TENANT));
                 data.put("pendingRents", rentStatusRepository.countByStatus("Unpaid"));
             }
             case "AGENT" -> {
                 data.put("activeListings", propertyRepository.countByTypeIgnoreCase("Rent"));
                 data.put("inquiries", inquiryRepository.count());
-                data.put("totalTenants", userRepository.countByRole(Role.TENANT));
+                data.put("totalTenants", userRepository.countByRole(User.Role.TENANT));
             }
             case "TENANT" -> {
                 data.put("nextRentDue", rentStatusRepository.findNextDueForTenant());

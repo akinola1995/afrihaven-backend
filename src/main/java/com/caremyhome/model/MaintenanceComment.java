@@ -1,21 +1,23 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.Embeddable;
-import lombok.Data;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Embeddable
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MaintenanceComment {
 
     private String from;
     private String text;
     private Date date = new Date();
+    private LocalDateTime timestamp = LocalDateTime.now();
 
-    public MaintenanceComment() {}
     public MaintenanceComment(String from, String text) {
-        this.from = from;
-        this.text = text;
     }
 }

@@ -1,5 +1,15 @@
 package com.caremyhome.model;
 
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class Rent {
     @Id

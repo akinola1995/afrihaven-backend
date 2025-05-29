@@ -1,5 +1,6 @@
 package com.caremyhome.controller;
 
+import com.caremyhome.dto.DocumentDTO;
 import com.caremyhome.model.Document;
 import com.caremyhome.model.Property;
 import com.caremyhome.repository.DocumentRepository;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/documents")

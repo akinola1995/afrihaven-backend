@@ -1,9 +1,21 @@
 package com.caremyhome.service;
 
+import com.caremyhome.dto.TenantAssignmentDto;
+import com.caremyhome.model.Property;
+import com.caremyhome.model.TenantAssignment;
+import com.caremyhome.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class AgentService {
 
-    @Autowired private PropertyRepository propertyRepo;
+    @Autowired
+    private PropertyRepository propertyRepo;
     @Autowired private TenantAssignmentRepository assignmentRepo;
     @Autowired private InquiryRepository inquiryRepo;
     @Autowired private MaintenanceRequestRepository maintenanceRepo;

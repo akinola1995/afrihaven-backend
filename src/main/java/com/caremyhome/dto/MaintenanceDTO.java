@@ -1,7 +1,9 @@
 package com.caremyhome.dto;
 
 import com.caremyhome.model.MaintenanceRequest;
+import lombok.Data;
 
+@Data
 public class MaintenanceDTO {
     private String issue;
     private String status;
@@ -20,7 +22,7 @@ public class MaintenanceDTO {
                 request.getIssue(),
                 request.getStatus(),
                 request.getCreatedAt().toString(), // Or format with DateTimeFormatter
-                request.getProperty().getTitle()
+                request.getProperty()
         );
     }
 

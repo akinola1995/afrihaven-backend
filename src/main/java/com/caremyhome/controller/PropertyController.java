@@ -1,17 +1,43 @@
 package com.caremyhome.controller;
 
 import com.caremyhome.dto.PropertyDTO;
+import com.caremyhome.model.Inquiry;
 import com.caremyhome.model.Property;
+import com.caremyhome.model.User;
+import com.caremyhome.repository.InquiryRepository;
+import com.caremyhome.repository.MessageRepository;
+import com.caremyhome.repository.PropertyRepository;
+import com.caremyhome.repository.UserRepository;
 import com.caremyhome.service.PropertyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/properties")
 public class PropertyController {
 
+    @Autowired
+    private PropertyRepository propertyRepository;
+
+    @Autowired
+    InquiryRepository inquiryRepository;
+
+    @Autowired
+    UserRepository userRepository;
     private final PropertyService service;
 
     public PropertyController(PropertyService service) {
@@ -46,7 +72,7 @@ public class PropertyController {
             @RequestPart("property") PropertyDTO dto,
             @RequestPart(value = "images", required = false) MultipartFile[] images,
             @RequestPart(value = "video", required = false) MultipartFile video
-    ) {
+    ) throws IOException {
         Optional<User> ownerOpt = userRepository.findByEmail(dto.getOwnerEmail());
         if (ownerOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid owner email");
@@ -140,4 +166,16 @@ public class PropertyController {
                 .filter(p -> state == null || p.getState().equalsIgnoreCase(state))
                 .toList();
     }
+
+    @GetMapping("/owner/{email}")
+    public ResponseEntity<List<Property>> getPropertiesByOwnerEmail(@PathVariable String email) {
+        Optional<User> ownerOpt = userRepository.findByEmail(email);
+        if (ownerOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<Property> properties = propertyRepository.findByOwner(ownerOpt.get());
+        return ResponseEntity.ok(properties);
+    }
+
+
 }

@@ -3,6 +3,11 @@ package com.caremyhome.model;
 import jakarta.persistence.*;
 import java.util.UUID;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class SavedProperty {
 
