@@ -2,32 +2,25 @@ package com.caremyhome.controller;
 
 import com.caremyhome.dto.InquiryDTO;
 import com.caremyhome.repository.InquiryRepository;
+import com.caremyhome.service.InquirerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/inquirer")
 public class InquirerController {
-
-    private final InquiryRepository inquiryRepository;
-
-    public InquirerController(InquiryRepository inquiryRepository) {
-        this.inquiryRepository = inquiryRepository;
-    }
+    @Autowired
+    private InquirerService inquirerService;
 
     @GetMapping("/inquiries")
-    public List<InquiryDTO> getInquiriesByEmail(@RequestParam String email) {
-        return inquiryRepository.findByEmail(email).stream()
-                .map(inq -> new InquiryDTO(
-                        inq.getProperty().getTitle(),
-                        inq.getStatus(),
-                        inq.getCreatedAt().toString()
-                ))
-                .collect(Collectors.toList());
+    public List<Map<String, Object>> getInquiries(@RequestParam String email) {
+        return inquirerService.getInquiriesByEmail(email);
     }
 }

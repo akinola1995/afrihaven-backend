@@ -1,87 +1,51 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class User {
-    @Id
-    @GeneratedValue
-    private UUID id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
-    private String phone;
-    private String role;
-    private String fullName;
+    @Column(nullable = false)
+    private String name;
+
+    @Column(unique = true, nullable = false)
     private String email;
-    private String password;
-    private String registeredBy;
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    public String getPhone() {
-        return phone;
-    }
+    // --- AGENT ---
+    @OneToMany(mappedBy = "assignedAgent")
+    private List<Property> managedProperties;
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    // --- TENANT ---
+    @OneToMany(mappedBy = "assignedTenant")
+    private List<PropertyTenantAssignment> assignments;
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = String.valueOf(role);
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
+    // --- AGENT Registration (track who added who) ---
+    @ManyToOne
+    @JoinColumn(name = "registered_by")
+    private User registeredBy;
 
     public enum Role {
-        OWNER, AGENT, TENANT
+        ADMIN, OWNER, AGENT, TENANT, BUYER, RENTER, INQUIRER
     }
-
-    // Getters and setters (or use Lombok later)
 }

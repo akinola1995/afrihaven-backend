@@ -11,49 +11,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/tenants")
 public class TenantController {
 
     @Autowired
-    private TenantService tenantService;
+    private TenantService tenantDashboardService;
 
-    @GetMapping("/{email}")
-    public ResponseEntity<TenantDTO> getTenantDashboard(@PathVariable String email) {
-        return ResponseEntity.ok(tenantService.getTenantDashboard(email));
+    // GET /api/tenant/{email}
+    @GetMapping("/api/tenant/{email}")
+    public Map<String, Object> getTenantDashboard(@PathVariable String email) {
+        return tenantDashboardService.getTenantDashboard(email);
     }
 
-    @Autowired
-    private TenantAssignmentRepository assignmentRepo;
-
-    @Autowired
-    private ManualTenantRepository manualRepo;
-
-    @GetMapping("/assignments/{propertyId}")
-    public List<TenantAssignment> getAssignments(@PathVariable String propertyId) {
-        return assignmentRepo.findByPropertyId(propertyId);
-    }
-
-    @DeleteMapping("/assignments/{id}")
-    public void deleteAssignment(@PathVariable UUID id) {
-        assignmentRepo.deleteById(id);
-    }
-
-    @GetMapping("/manual/{propertyId}")
-    public List<ManualTenant> getManualTenants(@PathVariable String propertyId) {
-        return manualRepo.findByPropertyId(propertyId);
-    }
-
-    @PostMapping("/manual")
-    public ManualTenant addManualTenant(@RequestBody ManualTenant tenant) {
-        return manualRepo.save(tenant);
-    }
-
-    @DeleteMapping("/manual/{id}")
-    public void deleteManualTenant(@PathVariable UUID id) {
-        manualRepo.deleteById(id);
+    // GET /api/documents/tenant/{email}
+    @GetMapping("/api/documents/tenant/{email}")
+    public List<Map<String, Object>> getTenantDocuments(@PathVariable String email) {
+        return tenantDashboardService.getTenantDocuments(email);
     }
 }
 

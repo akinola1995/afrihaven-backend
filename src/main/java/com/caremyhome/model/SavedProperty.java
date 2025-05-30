@@ -3,30 +3,29 @@ package com.caremyhome.model;
 import jakarta.persistence.*;
 import java.util.UUID;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@Entity
-public class SavedProperty {
 
+@Entity
+@Table(name = "saved_properties")
+@Data
+@NoArgsConstructor
+public class SavedProperty {
     @Id
     @GeneratedValue
     private UUID id;
 
-    private String title;
-    private String location;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @ManyToOne
+    @JoinColumn(name = "renter_id")
+    private User renter;  // The user who saved the property
 
     @ManyToOne
-    private User renter;
+    @JoinColumn(name = "property_id")
+    private Property property;
 
-    public enum Status {
-        Pending, Approved, Rejected
-    }
-
-    // Getters and Setters
+    @Column(nullable = false)
+    private String status; // e.g. "Approved", "Pending"
 }

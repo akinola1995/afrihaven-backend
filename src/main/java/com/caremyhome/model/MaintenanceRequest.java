@@ -16,35 +16,26 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MaintenanceRequest {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(nullable = false)
+    private String issue;
 
-    private String tenant;
-    private String tenantName;
-    private String tenantEmail;
+    @Column(nullable = false)
+    private String status; // "Open", "Resolved", etc.
+
+    @Column(nullable = false)
+    private LocalDateTime date = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "tenant_id")
+    private User tenant;
+
     @ManyToOne
     @JoinColumn(name = "property_id")
     private Property property;
-    private String issue;
-    private String urgency;
-    private String status;
-    @ManyToOne
-    private User agent;
 
-
-    private LocalDateTime createdAt;
-
-    @ElementCollection
-    @CollectionTable(name = "maintenance_comments", joinColumns = @JoinColumn(name = "request_id"))
-    private List<MaintenanceComment> comments = new ArrayList<>();
-
-    @PrePersist
-    public void init() {
-        this.createdAt = LocalDateTime.now();
-        this.status = "Pending";
-    }
-
-    // Getters and Setters
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

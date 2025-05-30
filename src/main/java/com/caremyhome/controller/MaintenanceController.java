@@ -20,6 +20,11 @@ public class MaintenanceController {
         this.maintenanceRequestRepository = repo;
     }
 
+    @GetMapping
+    public List<MaintenanceRequest> getAllRequests() {
+        return maintenanceRequestRepository.findAll();
+    }
+
     @GetMapping("/{propertyId}")
     public ResponseEntity<List<MaintenanceRequest>> getAll(@PathVariable Optional<UUID> propertyId) {
         List<MaintenanceRequest> result;

@@ -2,7 +2,9 @@ package com.caremyhome.controller;
 
 import com.caremyhome.model.Inquiry;
 import com.caremyhome.repository.InquiryRepository;
+import com.caremyhome.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,24 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/inquiries")
 public class InquiryController {
-
     @Autowired
-    private InquiryRepository inquiryRepo;
+    private InquiryService inquiryService;
 
+    // GET /api/inquiries/by-email?email=someone@email.com
     @GetMapping("/by-email")
-    public List<Inquiry> getByEmail(@RequestParam String email) {
-        return inquiryRepo.findByEmail(email);
-    }
-
-    @PostMapping
-    public Inquiry submitInquiry(@RequestBody Inquiry inquiry) {
-        return inquiryRepo.save(inquiry);
-    }
-
-    @GetMapping
-    public List<Inquiry> getAll() {
-        return inquiryRepo.findAll();
+    public List<Inquiry> getInquiriesByEmail(@RequestParam String email) {
+        return inquiryService.getInquiriesByEmail(email);
     }
 }
-
-

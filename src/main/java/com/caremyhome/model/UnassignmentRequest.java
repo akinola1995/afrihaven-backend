@@ -25,5 +25,7 @@ public class UnassignmentRequest {
     private Property property;
 
     private String reason;
+    private String tenantEmail;
+    private String propertyId;
     private LocalDateTime requestedAt;
 }

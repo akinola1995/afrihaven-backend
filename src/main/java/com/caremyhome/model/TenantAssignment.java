@@ -9,7 +9,12 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Builder;
 
+import lombok.Data;
+
+@Data
+@Builder
 @Getter
 @Setter
 @Entity
@@ -24,7 +29,8 @@ public class TenantAssignment {
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
-
+    private String unit;
+    private String tenantEmail;
     private String agentEmail;
 
     private String propertyId;
@@ -39,6 +45,9 @@ public class TenantAssignment {
     }
 
     public TenantAssignment() {}
+
+    @ManyToOne
+    private Property property;
 }
 
     // Getters & Setters

@@ -15,6 +15,11 @@ public class Document {
     @GeneratedValue
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "tenant_id")
+    private User tenant;
+
+
     private String name;
     private String url;
     private String description;

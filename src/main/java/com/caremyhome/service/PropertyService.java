@@ -1,7 +1,11 @@
 package com.caremyhome.service;
 
+import com.caremyhome.dto.PropertyDTO;
 import com.caremyhome.model.Property;
+import com.caremyhome.model.User;
 import com.caremyhome.repository.PropertyRepository;
+import com.caremyhome.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -9,21 +13,32 @@ import java.util.UUID;
 @Service
 public class PropertyService {
 
-    private final PropertyRepository repository;
+    @Autowired
+    private PropertyRepository propertyRepo;
 
-    public PropertyService(PropertyRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private UserRepository userRepo;
 
-    public List<Property> findAll() {
-        return repository.findAll();
-    }
+    public Property createProperty(PropertyDTO dto) {
+        Property prop = new Property();
+        prop.setTitle(dto.getTitle());
+        prop.setDescription(dto.getDescription());
+        prop.setPrice(dto.getPrice());
+        prop.setPropertyType(dto.getPropertyType());
+        prop.setBedrooms(dto.getBedrooms());
+        prop.setCountry(dto.getCountry());
+        prop.setState(dto.getState());
+        prop.setCity(dto.getCity());
+        prop.setType(dto.getType());
+        prop.setImageUrl(dto.getImageUrl());
+        prop.setOwnerEmail(dto.getOwnerEmail());
 
-    public Property save(Property entity) {
-        return repository.save(entity);
-    }
+        // Optional: assign real User/Owner
+        User owner = userRepo.findByEmail(dto.getOwnerEmail());
+        if (owner != null) {
+            prop.setOwner(owner);
+        }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+        return propertyRepo.save(prop);
     }
 }
