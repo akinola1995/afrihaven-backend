@@ -1,7 +1,6 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -40,11 +39,16 @@ public class Property {
     @Column(nullable = false)
     private String state;
 
-
     private String propertyType;
 
-    @Column
-    private String imageUrl;
+    // --- THIS IS ALL YOU NEED FOR MULTIPLE IMAGES ---
+    @ElementCollection
+    @CollectionTable(name = "property_images", joinColumns = @JoinColumn(name = "property_id"))
+    @Column(name = "image_url")
+    private List<String> images = new ArrayList<>();
+
+    // If you want, you can have a 'mainImage' field for convenience (optional):
+    // private String mainImage;
 
     @Column(nullable = false)
     private double price;
@@ -74,7 +78,6 @@ public class Property {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    // Property managed by an agent
     @ManyToOne
     @JoinColumn(name = "agent_id")
     private User assignedAgent;
@@ -95,4 +98,10 @@ public class Property {
 
     @Column(nullable = false)
     private String location;
+
+    // Store video URL/path (optional)
+    private String videoUrl;
+
+    public LocalDate nextDueDate;
 }
+

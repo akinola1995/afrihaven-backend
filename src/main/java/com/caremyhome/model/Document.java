@@ -1,43 +1,37 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
+@Table(name = "property_documents")
+@Data
+@NoArgsConstructor
 public class Document {
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    private User tenant;
+    @Column(nullable = false)
+    private String name; // original filename
 
+    @Column
+    private String description; // OPTIONAL: file description (nullable is OK)
 
-    private String name;
-    private String url;
-    private String description;
+    @Column(nullable = false)
+    private String filePath; // this is your storage path on server/disk
 
-    private LocalDateTime uploadedAt;
+    @Column
+    private String url; // actual downloadable or public URL, can be nullable
 
-    @PrePersist
-    public void setTimestamp() {
-        this.uploadedAt = LocalDateTime.now();
-    }
-
-    private String filePath;
-
-    @ManyToOne
-    private User uploadedBy;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    // Getters and setters
+    @Column(nullable = false)
+    private Instant uploadedAt;
 }

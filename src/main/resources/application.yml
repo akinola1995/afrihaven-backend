@@ -28,5 +28,8 @@ spring:
 server:
   port: 8080
 
+afrihaven:
+  uploads:
+    dir: uploads
 
 

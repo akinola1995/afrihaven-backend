@@ -1,30 +1,34 @@
 package com.caremyhome.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 import java.util.UUID;
 
-@Getter
-@Setter
-public class ManualTenant {
 
+@Entity
+@Table(name = "manual_tenants")
+@Data
+@NoArgsConstructor
+public class ManualTenant {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = false)
+    private Property property;
+
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String unit;
 
+    @Column(nullable = false)
     private String phone;
-
-    private String propertyId;
-
-    // Getters & Setters
-
 }

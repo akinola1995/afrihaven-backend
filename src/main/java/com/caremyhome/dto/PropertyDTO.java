@@ -3,6 +3,8 @@ package com.caremyhome.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class PropertyDTO {
     private String title;
@@ -15,5 +17,6 @@ public class PropertyDTO {
     private int price;
     private int bedrooms;
     private String imageUrl;
+    private List<String> images;
     private String ownerEmail; // passed from frontend
 }

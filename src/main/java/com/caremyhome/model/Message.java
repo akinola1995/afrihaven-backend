@@ -1,31 +1,35 @@
 package com.caremyhome.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.*;
 
+import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "messages")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Entity
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private UUID id;
 
-    private String fromEmail;
+    @Column(nullable = false)
     private String fromName;
+
+    @Column(nullable = false)
+    private String fromEmail;
+
+    @Column(nullable = false)
     private String toEmail;
+
+    @Column(nullable = false)
     private String subject;
+
+    @Column(nullable = false, length = 4000)
     private String message;
-    private String content;
 
-    private LocalDateTime sentAt;
+    @Column(nullable = false)
+    private LocalDateTime sentAt = LocalDateTime.now();
 }
-

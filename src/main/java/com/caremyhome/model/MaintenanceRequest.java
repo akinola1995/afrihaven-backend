@@ -2,6 +2,7 @@ package com.caremyhome.model;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,32 +11,48 @@ import java.util.UUID;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "maintenance_requests")
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class MaintenanceRequest {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @Column(nullable = false)
+    private UUID propertyId;
+
+    @Column(nullable = false)
+    private String tenantEmail;
+
+    @Column(nullable = false)
+    private String tenantName;
 
     @Column(nullable = false)
     private String issue;
 
     @Column(nullable = false)
-    private String status; // "Open", "Resolved", etc.
+    private String urgency;
 
     @Column(nullable = false)
-    private LocalDateTime date = LocalDateTime.now();
+    private String status = "Pending";
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    private User tenant;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
 
-    @ManyToOne
-    @JoinColumn(name = "property_id")
-    private Property property;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "maintenance_comments", joinColumns = @JoinColumn(name = "maintenance_id"))
+    private List<Comment> comments = new ArrayList<>();
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Embeddable
+    @Data
+    @NoArgsConstructor
+    public static class Comment {
+        @Column(nullable = false)
+        private String from;  // role or user
+        @Column(nullable = false, columnDefinition = "TEXT")
+        private String text;
+        @Column(nullable = false)
+        private Instant date = Instant.now();
+    }
 }

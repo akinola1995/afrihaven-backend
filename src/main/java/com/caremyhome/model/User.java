@@ -25,6 +25,12 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -48,4 +54,7 @@ public class User {
     public enum Role {
         ADMIN, OWNER, AGENT, TENANT, BUYER, RENTER, INQUIRER
     }
+
+    @Column
+    private String avatarUrl;
 }

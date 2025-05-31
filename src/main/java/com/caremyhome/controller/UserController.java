@@ -2,9 +2,11 @@ package com.caremyhome.controller;
 
 import com.caremyhome.model.User;
 import com.caremyhome.repository.UserRepository;
+import com.caremyhome.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,70 +16,83 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
+    // GET /api/users/{email}
     @GetMapping("/{email}")
-    public ResponseEntity<?> getUser(@PathVariable String email) {
-        return userRepository.findByEmail(email)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+        return userService.findByEmail(email)
+                .map(user -> ResponseEntity.ok(Map.of(
+                        "name", user.getName(),
+                        "email", user.getEmail(),
+                        "role", user.getRole(),
+                        "phone", user.getPhone(),
+                        "avatarUrl", user.getAvatarUrl()
+                )))
+                .orElse(ResponseEntity.notFound().build());
     }
-    /*
-     @GetMapping("/{email}")
-     public ResponseEntity<User> getUser(@PathVariable String email) {
-     return userRepository.findByEmail(email)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-}
 
-     */
-
-    @PutMapping(value = "/{email}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // PUT /api/users/{email}
+    @PutMapping(value = "/{email}", consumes = "multipart/form-data")
     public ResponseEntity<?> updateUser(
             @PathVariable String email,
-            @RequestParam("name") String name,
-            @RequestParam("phone") String phone,
-            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
-
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) return ResponseEntity.notFound().build();
-
-        User user = userOpt.get();
-        user.setFullName(name);
-        user.setPhone(phone);
-
-        if (avatar != null && !avatar.isEmpty()) {
-            try {
-                String filename = UUID.randomUUID() + "_" + avatar.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/avatars");
-                Files.createDirectories(uploadPath);
-                Files.copy(avatar.getInputStream(), uploadPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-                user.setAvatarUrl("/uploads/avatars/" + filename);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Avatar upload failed.");
-            }
+            @RequestPart("name") String name,
+            @RequestPart("phone") String phone,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar
+    ) {
+        try {
+            User updated = userService.updateUser(email, name, phone, avatar);
+            return ResponseEntity.ok(Map.of(
+                    "name", updated.getName(),
+                    "email", updated.getEmail(),
+                    "role", updated.getRole(),
+                    "phone", updated.getPhone(),
+                    "avatarUrl", updated.getAvatarUrl()
+            ));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to update avatar.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("User not found.");
         }
-
-        userRepository.save(user);
-        return ResponseEntity.ok("User profile updated");
     }
-
-        @PostMapping("/register")
-        public ResponseEntity<?> registerUser(@RequestBody User user) {
-            if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-                return ResponseEntity.badRequest().body("Email already registered");
-            }
-            userRepository.save(user);
-            return ResponseEntity.ok("User registered successfully");
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email already registered"));
         }
+
+        // Hash the password!
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Set default role if not provided
+        if (user.getRole() == null) {
+            user.setRole(User.Role.INQUIRER); // Or whatever your default is
+        }
+
+        User saved = userRepository.save(user);
+
+        // Send minimal safe response for frontend
+        return ResponseEntity.ok(Map.of(
+                "email", saved.getEmail(),
+                "role", saved.getRole(),
+                "name", saved.getName()
+        ));
+    }
     }
 
 

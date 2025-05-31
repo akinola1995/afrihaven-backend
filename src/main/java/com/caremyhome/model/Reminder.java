@@ -1,28 +1,29 @@
 package com.caremyhome.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 @Entity
+@Table(name = "reminders")
+@Data
+@NoArgsConstructor
 public class Reminder {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false)
     private String title;
-    private String date; // Stored as String (e.g. 2025-05-12)
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    @Column(nullable = false)
     private String type; // Rent, Inspection, Maintenance
-    private String email;
 
-    // Getters and Setters
+    @Column(nullable = false)
+    private String email; // who this reminder is for
 }
-

@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
-    List<Reminder> findByEmail(String email);
+    List<Reminder> findByEmailOrderByDateDesc(String email);
 }

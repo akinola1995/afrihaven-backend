@@ -12,4 +12,5 @@ public interface DocumentRepository extends JpaRepository<Document, UUID> {
 
     List<Document> findByPropertyId(UUID propertyId);
     List<Document> findByTenantEmailOrderByUploadedAtDesc(String email);
+    List<Document> findByProperty_Id(UUID propertyId);
 }

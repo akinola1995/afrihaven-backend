@@ -3,9 +3,6 @@ package com.caremyhome.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,11 +18,19 @@ public class Inquiry {
     @Column(nullable = false)
     private String from; // Email
 
-    @Column(nullable = false, length = 2000)
+    @Column(nullable = false)
     private String message;
 
+    // NEW: Add Name (not nullable, since your UI requires it)
     @Column(nullable = false)
-    private String status; // e.g., "Open", "Closed", "In Progress"
+    private String name;
+
+    // NEW: Add Phone (optional, so nullable)
+    @Column
+    private String phone;
+
+    @Column(nullable = false)
+    private String status; // e.g., "Open", "Closed", "In Progress", "Replied"
 
     @ManyToOne
     @JoinColumn(name = "property_id")

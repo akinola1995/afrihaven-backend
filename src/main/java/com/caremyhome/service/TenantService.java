@@ -1,16 +1,16 @@
 package com.caremyhome.service;
 
 import com.caremyhome.dto.TenantDTO;
+import com.caremyhome.dto.TenantViewDTO;
 import com.caremyhome.model.Property;
+import com.caremyhome.model.PropertyTenantAssignment;
 import com.caremyhome.model.Tenant;
 import com.caremyhome.model.User;
 import com.caremyhome.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,15 +20,26 @@ public class TenantService {
     @Autowired private MaintenanceRequestRepository maintenanceRepo;
     @Autowired private DocumentRepository documentRepo;
 
+    @Autowired
+    private PropertyTenantAssignmentRepository assignmentRepo;
+
+
     public Map<String, Object> getTenantDashboard(String email) {
-        User tenant = userRepo.findByEmail(email);
-        if (tenant == null) return null;
+        Optional<User> tenantOpt = userRepo.findByEmail(email);
+        if (tenantOpt.isEmpty()) return null;
 
-        // Find property for this tenant (adjust logic if 1:1 is not guaranteed)
-        Property property = propertyRepo.findByTenantEmail(email);
+        User tenant = tenantOpt.get();
 
-        // Maintenance requests
-        List<Map<String, Object>> maintenance = maintenanceRepo.findByTenantEmailOrderByCreatedAtDesc(email)
+        // Find the current active assignment for this tenant
+        PropertyTenantAssignment assignment = assignmentRepo
+                .findFirstByAssignedTenantAndStatusOrderByAssignedAtDesc(tenant, "Active")
+                .orElse(null);
+
+        Property property = assignment != null ? assignment.getProperty() : null;
+
+        // Maintenance requests for this tenant (OPTIONAL: filter by property)
+        List<Map<String, Object>> maintenance = maintenanceRepo
+                .findByTenantEmailOrderByCreatedAtDesc(email)
                 .stream().map(req -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("issue", req.getIssue());
@@ -39,19 +50,22 @@ public class TenantService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("name", tenant.getName());
-        result.put("property", Map.of(
-                "id", property.getId(),
-                "title", property.getTitle(),
-                "unit", property.getUnit(),
-                "location", property.getLocation(),
-                "rent", property.getRent(),
-                "dueDate", property.getDueDate()
-        ));
+        if (property != null) {
+            result.put("property", Map.of(
+                    "id", property.getId(),
+                    "title", property.getTitle(),
+                    "unit", assignment.getUnit(),
+                    "location", property.getCity() + ", " + property.getState(),
+                    "rent", property.getRent(),
+                    "dueDate", property.getDueDate()
+            ));
+        } else {
+            result.put("property", null);
+        }
         result.put("maintenanceRequests", maintenance);
 
         return result;
     }
-
     public List<Map<String, Object>> getTenantDocuments(String email) {
         return documentRepo.findByTenantEmailOrderByUploadedAtDesc(email).stream()
                 .map(doc -> {
@@ -63,4 +77,25 @@ public class TenantService {
                     return map;
                 }).collect(Collectors.toList());
     }
+
+
+
+    public List<TenantViewDTO> getTenantsForProperty(UUID propertyId) {
+        Optional<Property> propertyOpt = propertyRepo.findById(propertyId);
+        if (propertyOpt.isEmpty()) return Collections.emptyList();
+
+        List<PropertyTenantAssignment> assignments = assignmentRepo.findByProperty(propertyOpt.get());
+        return assignments.stream().map(assignment -> {
+            User tenant = assignment.getAssignedTenant();
+            String rentStatus = assignment.getRentStatus(); // or calculate it
+            return new TenantViewDTO(
+                    tenant.getName(),
+                    tenant.getEmail(),
+                    assignment.getUnit(),
+                    tenant.getPhone(),
+                    rentStatus
+            );
+        }).collect(Collectors.toList());
+    }
+
 }
