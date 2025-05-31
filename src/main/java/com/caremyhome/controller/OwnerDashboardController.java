@@ -1,17 +1,7 @@
 package com.caremyhome.controller;
 
-import com.caremyhome.dto.OwnerDashboardDTO;
 import com.caremyhome.dto.OwnerDashboardResponseDTO;
-import com.caremyhome.dto.RentUploadDTO;
-import com.caremyhome.dto.TenantAssignmentDto;
-import com.caremyhome.dto.UnassignmentRequestDTO;
-import com.caremyhome.model.Inquiry;
-import com.caremyhome.model.MaintenanceRequest;
-import com.caremyhome.model.Property;
-import com.caremyhome.model.User;
-import com.caremyhome.repository.*;
 import com.caremyhome.service.OwnerDashboardService;
-import com.caremyhome.service.OwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

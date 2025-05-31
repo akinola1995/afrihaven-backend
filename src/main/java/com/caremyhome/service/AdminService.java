@@ -31,8 +31,8 @@ public class AdminService {
 
     public List<User> getAdmins() { return userRepo.findByRole(User.Role.ADMIN); }
     public List<Property> getAllProperties() { return propertyRepo.findAll(); }
-    public List<Inquiry> getAllInquiries() { return inquiryRepo.findAllByOrderByDateDesc(); }
-    public List<MaintenanceRequest> getAllMaintenanceRequests() { return maintRepo.findAllByOrderByDateDesc(); }
+    public List<Inquiry> getAllInquiries() { return inquiryRepo.findAllByOrderByCreatedAtDesc(); }
+    public List<MaintenanceRequest> getAllMaintenanceRequests() { return maintRepo.findAllByOrderByCreatedAtDesc(); }
     public UserStatsDTO getUserStats() {
         long tenants = userRepo.findByRole(User.Role.TENANT).size();
         long agents = userRepo.findByRole(User.Role.AGENT).size();

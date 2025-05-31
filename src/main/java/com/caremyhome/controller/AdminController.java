@@ -57,7 +57,7 @@ public class AdminController {
 
     @GetMapping("/inquiries")
     public List<Map<String, Object>> getInquiries() {
-        return inquiryRepo.findAllByOrderByDateDesc().stream().map(inq -> {
+        return inquiryRepo.findAllByOrderByCreatedAtDesc().stream().map(inq -> {
             Map<String, Object> m = new HashMap<>();
             m.put("id", inq.getId());
             m.put("from", inq.getFrom());
@@ -70,13 +70,13 @@ public class AdminController {
 
     @GetMapping("/maintenance")
     public List<Map<String, Object>> getMaintenance() {
-        return maintRepo.findAllByOrderByDateDesc().stream().map(mr -> {
+        return maintRepo.findAllByOrderByCreatedAtDesc().stream().map(mr -> {
             Map<String, Object> m = new HashMap<>();
             m.put("id", mr.getId());
             m.put("issue", mr.getIssue());
             m.put("status", mr.getStatus());
-            m.put("propertyId", mr.getProperty() != null ? mr.getProperty().getId() : null);
-            m.put("date", mr.getDate());
+            m.put("propertyId", mr.getPropertyId());
+            m.put("date", mr.getCreatedAt());
             return m;
         }).collect(Collectors.toList());
     }

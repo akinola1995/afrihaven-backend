@@ -44,4 +44,8 @@ public class RentUpload {
     // Optionally, timestamp of upload/payment
     @Column(nullable = false)
     private LocalDate createdAt = LocalDate.now();
+
+    private LocalDateTime uploadedAt;
+
+    private String fileName;
 }

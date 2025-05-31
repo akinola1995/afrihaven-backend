@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+    long countByRole(User.Role role);
     List<User> findByRole(User.Role role);
     List<User> findByRoleAndRegisteredBy(User.Role role, User registeredBy);
     boolean existsByEmail(String email);

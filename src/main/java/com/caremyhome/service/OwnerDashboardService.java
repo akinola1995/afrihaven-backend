@@ -24,9 +24,10 @@ public class OwnerDashboardService {
     @Autowired private UnassignmentRequestRepository unassignmentRequestRepo;
 
     public OwnerDashboardResponseDTO getOwnerDashboard(String ownerEmail) {
-        User owner = userRepo.findByEmail(ownerEmail);
-        if (owner == null || owner.getRole() != User.Role.OWNER) {
-            throw new RuntimeException("Owner not found or not an owner");
+        User owner = userRepo.findByEmail(ownerEmail)
+                .orElseThrow(() -> new RuntimeException("Owner not found or not an owner"));
+        if (owner.getRole() != User.Role.OWNER) {
+            throw new RuntimeException("User is not an owner");
         }
 
         List<Property> properties = propertyRepo.findByOwner(owner);
@@ -58,7 +59,7 @@ public class OwnerDashboardService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("issue", m.getIssue());
                     map.put("status", m.getStatus());
-                    map.put("propertyId", m.getProperty().getId());
+                    map.put("propertyId", m.getPropertyId());
                     map.put("date", m.getCreatedAt());
                     return map;
                 }).collect(Collectors.toList());
@@ -74,7 +75,7 @@ public class OwnerDashboardService {
                 })
                 .map(r -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("tenant", r.getTenant() != null ? r.getTenant().getEmail() : "");
+                    map.put("tenant", r.getTenant() != null ? r.getTenant() : "");
                     map.put("file", r.getFileName());
                     map.put("amount", r.getAmount());
                     map.put("date", r.getUploadedAt());
@@ -115,10 +116,10 @@ public class OwnerDashboardService {
     }
 
     public void assignTenant(String tenantEmail, UUID propertyId) {
-        User tenant = userRepo.findByEmail(tenantEmail);
-        Property property = propertyRepo.findById(propertyId).orElse(null);
-        if (tenant == null || property == null) throw new RuntimeException("Invalid tenant or property");
-
+        User tenant = userRepo.findByEmail(tenantEmail)
+                .orElseThrow(() -> new RuntimeException("Tenant not found"));
+        Property property = propertyRepo.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
         // You might want to prevent duplicate assignments here
         PropertyTenantAssignment assignment = new PropertyTenantAssignment();
         assignment.setAssignedTenant(tenant);

@@ -37,10 +37,7 @@ public class PropertyService {
         // Optional: you may add logic here to fetch/set a default image
         // but don't setImages(dto.getImages()) unless dto has them (rare for JSON)
 
-        User owner = userRepo.findByEmail(dto.getOwnerEmail());
-        if (owner != null) {
-            prop.setOwner(owner);
-        }
+        userRepo.findByEmail(dto.getOwnerEmail()).ifPresent(prop::setOwner);
 
         return propertyRepo.save(prop);
     }
@@ -84,10 +81,7 @@ public class PropertyService {
             prop.setVideoUrl("/uploads/properties/" + vFilename);
         }
 
-        User owner = userRepo.findByEmail(dto.getOwnerEmail());
-        if (owner != null) {
-            prop.setOwner(owner);
-        }
+        userRepo.findByEmail(dto.getOwnerEmail()).ifPresent(prop::setOwner);
 
         return propertyRepo.save(prop);
     }

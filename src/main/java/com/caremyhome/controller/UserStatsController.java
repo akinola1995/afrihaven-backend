@@ -24,12 +24,12 @@ public class UserStatsController {
 
     @GetMapping("/stats")
     public UserStatsDTO getUserStats() {
-        UserStatsDTO stats = new UserStatsDTO();
-        stats.setTenants(userRepo.countByRole(User.Role.TENANT));
-        stats.setAgents(userRepo.countByRole(User.Role.AGENT));
-        stats.setOwners(userRepo.countByRole(User.Role.OWNER));
-        stats.setInquiries(inquiryRepo.count());
-        return stats;
+        long tenants = userRepo.countByRole(User.Role.TENANT);
+        long agents = userRepo.countByRole(User.Role.AGENT);
+        long owners = userRepo.countByRole(User.Role.OWNER);
+        long inquiries = inquiryRepo.count();
+
+        return new UserStatsDTO(tenants, agents, owners, inquiries);
     }
 }
 

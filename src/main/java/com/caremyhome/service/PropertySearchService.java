@@ -53,7 +53,7 @@ public class PropertySearchService {
             map.put("state", prop.getState());
             map.put("country", prop.getCountry());
             map.put("type", prop.getType());
-            map.put("imageUrl", prop.getImageUrl());
+            map.put("imageUrl", prop.getImages());
             return map;
         }).collect(Collectors.toList());
     }

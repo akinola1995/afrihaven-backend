@@ -20,8 +20,8 @@ public class RenterDashboardService {
 
     // For /api/renter/saved
     public List<Map<String, Object>> getSavedProperties(String email) {
-        User renter = userRepo.findByEmail(email);
-        if (renter == null) return Collections.emptyList();
+        User renter = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Renter not found"));
 
         return savedPropertyRepo.findByRenter(renter).stream().map(sp -> {
             Map<String, Object> map = new HashMap<>();

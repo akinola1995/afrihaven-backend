@@ -13,10 +13,10 @@ public class UserDTO {
 
     public static UserDTO fromEntity(User user) {
         UserDTO dto = new UserDTO();
-        dto.setFullName(user.getFullName());
+        dto.setFullName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setPhone(user.getPhone());
-        dto.setRole(user.getRole());
+        dto.setRole(String.valueOf(user.getRole()));
         return dto;
     }
 }
