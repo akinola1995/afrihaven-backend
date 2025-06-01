@@ -75,11 +75,11 @@ public class Property {
     private LocalDate dueDate;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", columnDefinition = "uuid")
     private User owner;
 
     @ManyToOne
-    @JoinColumn(name = "agent_id")
+    @JoinColumn(name = "agent_id", columnDefinition = "uuid")
     private User assignedAgent;
 
     private String ownerEmail;

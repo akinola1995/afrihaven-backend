@@ -16,7 +16,7 @@ public class PropertySearchController {
     private PropertySearchService propertySearchService;
 
     // GET /api/properties/search?type=rent&country=Nigeria&state=Lagos&minPrice=50000&bedrooms=2
-    @GetMapping("/search")
+    @GetMapping("/searches")
     public List<Map<String, Object>> search(@RequestParam Map<String, String> params) {
         return propertySearchService.search(params);
     }

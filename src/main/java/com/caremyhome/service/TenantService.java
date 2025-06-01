@@ -32,7 +32,7 @@ public class TenantService {
 
         // Find the current active assignment for this tenant
         PropertyTenantAssignment assignment = assignmentRepo
-                .findFirstByAssignedTenantAndStatusOrderByAssignedAtDesc(tenant, "Active")
+                .findFirstByTenantAndStatusOrderByAssignedAtDesc(tenant, "Active")
                 .orElse(null);
 
         Property property = assignment != null ? assignment.getProperty() : null;
@@ -86,7 +86,7 @@ public class TenantService {
 
         List<PropertyTenantAssignment> assignments = assignmentRepo.findByProperty(propertyOpt.get());
         return assignments.stream().map(assignment -> {
-            User tenant = assignment.getAssignedTenant();
+            User tenant = assignment.getTenant();
             String rentStatus = assignment.getRentStatus(); // or calculate it
             return new TenantViewDTO(
                     tenant.getName(),

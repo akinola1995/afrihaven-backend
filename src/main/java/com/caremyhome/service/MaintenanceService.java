@@ -39,7 +39,7 @@ public class MaintenanceService {
     public MaintenanceRequest addComment(UUID requestId, String from, String text) {
         MaintenanceRequest req = repo.findById(requestId).orElseThrow();
         MaintenanceRequest.Comment comment = new MaintenanceRequest.Comment();
-        comment.setFrom(from);
+        comment.setFromUser(from);
         comment.setText(text);
         comment.setDate(Instant.now());
         req.getComments().add(comment);

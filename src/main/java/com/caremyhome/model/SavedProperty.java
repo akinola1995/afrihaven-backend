@@ -19,7 +19,7 @@ public class SavedProperty {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "renter_id")
+    @JoinColumn(name = "renter_id", columnDefinition = "uuid")
     private User renter;  // The user who saved the property
 
     @ManyToOne

@@ -25,7 +25,7 @@ public class MaintenanceDTO {
                 request.getIssue(),
                 request.getStatus(),
                 request.getCreatedAt().toString(), // Or format with DateTimeFormatter
-                request.getPropertyId()
+                request.getProperty().getId()
         );
     }
 

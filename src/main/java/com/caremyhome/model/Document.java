@@ -25,6 +25,8 @@ public class Document {
     @Column(nullable = false)
     private String filePath; // this is your storage path on server/disk
 
+    private String tenantEmail;
+
     @Column
     private String url; // actual downloadable or public URL, can be nullable
 

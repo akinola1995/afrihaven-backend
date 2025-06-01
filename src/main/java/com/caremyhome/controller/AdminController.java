@@ -1,22 +1,16 @@
 package com.caremyhome.controller;
 
 import com.caremyhome.dto.UserStatsDTO;
-import com.caremyhome.model.Admin;
 import com.caremyhome.model.Property;
 import com.caremyhome.model.User;
-import com.caremyhome.repository.AdminRepository;
 import com.caremyhome.repository.InquiryRepository;
 import com.caremyhome.repository.MaintenanceRequestRepository;
 import com.caremyhome.repository.PropertyRepository;
 import com.caremyhome.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,7 +32,7 @@ public class AdminController {
         return adminService.addAdmin(body.get("name"), body.get("email"));
     }
 
-    @GetMapping("/properties")
+    @GetMapping("/admin/properties")
     public List<Map<String, Object>> getProperties() {
         List<Property> props = propertyRepo.findAll();
         return props.stream().map(p -> {
@@ -60,7 +54,7 @@ public class AdminController {
         return inquiryRepo.findAllByOrderByCreatedAtDesc().stream().map(inq -> {
             Map<String, Object> m = new HashMap<>();
             m.put("id", inq.getId());
-            m.put("from", inq.getFrom());
+            m.put("from", inq.getFromUser());
             m.put("message", inq.getMessage());
             m.put("propertyId", inq.getProperty() != null ? inq.getProperty().getId() : null);
             m.put("date", inq.getDate());
@@ -75,7 +69,7 @@ public class AdminController {
             m.put("id", mr.getId());
             m.put("issue", mr.getIssue());
             m.put("status", mr.getStatus());
-            m.put("propertyId", mr.getPropertyId());
+            m.put("propertyId", mr.getProperty() != null ? mr.getProperty().getId() : null);
             m.put("date", mr.getCreatedAt());
             return m;
         }).collect(Collectors.toList());

@@ -22,6 +22,7 @@ public class RenterInquiry {
     private LocalDateTime createdAt;
 
     @ManyToOne
+    @JoinColumn(name = "renter_id", columnDefinition = "uuid")
     private User renter;
 
     @PrePersist

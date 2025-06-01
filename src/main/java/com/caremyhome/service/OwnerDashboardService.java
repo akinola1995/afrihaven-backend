@@ -59,7 +59,7 @@ public class OwnerDashboardService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("issue", m.getIssue());
                     map.put("status", m.getStatus());
-                    map.put("propertyId", m.getPropertyId());
+                    map.put("propertyId", m.getProperty().getId());
                     map.put("date", m.getCreatedAt());
                     return map;
                 }).collect(Collectors.toList());
@@ -87,7 +87,7 @@ public class OwnerDashboardService {
                 .findByPropertyOwnerAndStatus(owner, "Active").stream()
                 .map(a -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("email", a.getAssignedTenant().getEmail());
+                    map.put("email", a.getTenant().getEmail());
                     map.put("propertyId", a.getProperty().getId());
                     map.put("assignedAt", a.getAssignedAt());
                     return map;
@@ -122,7 +122,7 @@ public class OwnerDashboardService {
                 .orElseThrow(() -> new RuntimeException("Property not found"));
         // You might want to prevent duplicate assignments here
         PropertyTenantAssignment assignment = new PropertyTenantAssignment();
-        assignment.setAssignedTenant(tenant);
+        assignment.setTenant(tenant);
         assignment.setAssignedBy(property.getOwner());
         assignment.setProperty(property);
         assignment.setUnit(""); // fill if applicable

@@ -17,8 +17,8 @@ public class Inquiry {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    private String from; // Email
+    @Column(name = "from_user", nullable = false)
+    private String fromUser;
 
     @Column(nullable = false)
     private String message;

@@ -1,20 +1,10 @@
 // src/main/java/com/caremyhome/controller/AuthController.java
 package com.caremyhome.controller;
 import com.caremyhome.service.AuthService;
-import com.caremyhome.service.EmailService;
-import org.springframework.mail.SimpleMailMessage;
-
-import com.caremyhome.dto.AuthRequest;
-import com.caremyhome.dto.AuthResponse;
-import com.caremyhome.dto.RegisterDTO;
-import com.caremyhome.dto.UserDTO;
 import com.caremyhome.model.User;
-import com.caremyhome.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import java.util.HashMap;
 import java.util.Map;

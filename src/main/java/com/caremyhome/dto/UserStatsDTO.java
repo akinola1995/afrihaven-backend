@@ -9,6 +9,8 @@ public class UserStatsDTO {
     private long owners;
     private long inquiries;
 
+    public UserStatsDTO() {}
+
     public UserStatsDTO(long tenants, long agents, long owners, long inquiries) {
         this.tenants = tenants;
         this.agents = agents;

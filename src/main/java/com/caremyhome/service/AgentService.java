@@ -60,7 +60,7 @@ public class AgentService {
             throw new RuntimeException("Agent not assigned to this property");
 
         PropertyTenantAssignment assignment = new PropertyTenantAssignment();
-        assignment.setAssignedTenant(tenant);
+        assignment.setTenant(tenant);
         assignment.setAssignedBy(agent);
         assignment.setProperty(property);
         assignment.setUnit(unit);
@@ -76,7 +76,7 @@ public class AgentService {
         User agent = agentOpt.get();
         User tenant = tenantOpt.get();
 
-        List<PropertyTenantAssignment> assignments = assignmentRepo.findByAssignedTenant(tenant);
+        List<PropertyTenantAssignment> assignments = assignmentRepo.findByTenant(tenant);
         for (PropertyTenantAssignment a : assignments) {
             if (a.getAssignedBy().equals(agent) && a.getStatus().equals("Active")) {
                 a.setStatus("Unassigned");

@@ -19,8 +19,9 @@ public class MaintenanceRequest {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID propertyId;
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = false)
+    private Property property;   // This is the correct way for JPA!
 
     @Column(nullable = false)
     private String tenantEmail;
@@ -49,7 +50,7 @@ public class MaintenanceRequest {
     @NoArgsConstructor
     public static class Comment {
         @Column(nullable = false)
-        private String from;  // role or user
+        private String fromUser;
         @Column(nullable = false, columnDefinition = "TEXT")
         private String text;
         @Column(nullable = false)

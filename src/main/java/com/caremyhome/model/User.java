@@ -1,11 +1,9 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +14,10 @@ import lombok.Setter;
 @Table(name = "users")
 @NoArgsConstructor
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id
+    @GeneratedValue
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -43,12 +43,12 @@ public class User {
     private List<Property> managedProperties;
 
     // --- TENANT ---
-    @OneToMany(mappedBy = "assignedTenant")
+    @OneToMany(mappedBy = "tenant")
     private List<PropertyTenantAssignment> assignments;
 
     // --- AGENT Registration (track who added who) ---
     @ManyToOne
-    @JoinColumn(name = "registered_by")
+    @JoinColumn(name = "registered_by", columnDefinition = "uuid")
     private User registeredBy;
 
     public enum Role {

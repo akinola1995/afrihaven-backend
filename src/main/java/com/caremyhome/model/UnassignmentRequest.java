@@ -16,16 +16,18 @@ public class UnassignmentRequest {
     private UUID id;
 
     @ManyToOne
+    @JoinColumn(name = "owner_id", columnDefinition = "uuid")
     private User owner;
 
     @ManyToOne
+    @JoinColumn(name = "tenant_id", columnDefinition = "uuid")
     private User tenant;
 
     @ManyToOne
-    private Property property;
+    private Property property; // << This is all you need!
 
     private String reason;
     private String tenantEmail;
-    private String propertyId;
+    // REMOVE this line: private String propertyId;
     private LocalDateTime requestedAt;
 }

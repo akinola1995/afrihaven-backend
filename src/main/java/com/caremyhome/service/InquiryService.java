@@ -26,7 +26,7 @@ public class InquiryService {
         Property property = propertyRepo.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
         Inquiry inq = new Inquiry();
-        inq.setFrom(req.getEmail());
+        inq.setFromUser(req.getEmail());
         inq.setName(req.getName());
         inq.setPhone(req.getPhone());
         inq.setMessage(req.getMessage());

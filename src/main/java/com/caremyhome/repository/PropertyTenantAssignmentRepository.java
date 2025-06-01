@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface PropertyTenantAssignmentRepository extends JpaRepository<PropertyTenantAssignment, UUID> {
     List<PropertyTenantAssignment> findByPropertyAssignedAgentAndStatus(User agent, String status);
 
-    List<PropertyTenantAssignment> findByAssignedTenant(User tenant);
+    List<PropertyTenantAssignment> findByTenant(User tenant);
 
     List<PropertyTenantAssignment> findByAssignedBy(User agent);
 
@@ -27,5 +27,5 @@ public interface PropertyTenantAssignmentRepository extends JpaRepository<Proper
     List<PropertyTenantAssignment> findByProperty(Property property);
 
     // In PropertyTenantAssignmentRepository
-    Optional<PropertyTenantAssignment> findFirstByAssignedTenantAndStatusOrderByAssignedAtDesc(User tenant, String status);
+    Optional<PropertyTenantAssignment> findFirstByTenantAndStatusOrderByAssignedAtDesc(User tenant, String status);
 }

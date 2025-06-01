@@ -34,7 +34,7 @@ public class RenterDashboardService {
 
     // For /api/renter/inquiries
     public List<Map<String, Object>> getRenterInquiries(String email) {
-        return inquiryRepo.findByFromOrderByCreatedAtDesc(email).stream().map(inq -> {
+        return inquiryRepo.findByFromUserOrderByCreatedAtDesc(email).stream().map(inq -> {
             Map<String, Object> map = new HashMap<>();
             map.put("propertyName", inq.getProperty() != null ? inq.getProperty().getTitle() : "N/A");
             map.put("createdAt", inq.getCreatedAt());

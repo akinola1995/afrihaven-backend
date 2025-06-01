@@ -31,7 +31,7 @@ public class PropertyTenantService {
         return assignments.stream().map(a -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", a.getId());
-            map.put("email", a.getAssignedTenant() != null ? a.getAssignedTenant().getEmail() : "");
+            map.put("email", a.getTenant() != null ? a.getTenant().getEmail() : "");
             map.put("unit", a.getUnit());
             map.put("assignedAt", a.getAssignedAt());
             return map;

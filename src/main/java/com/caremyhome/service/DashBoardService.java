@@ -31,7 +31,8 @@ public class DashBoardService {
                 stats.put("totalTenants", assignmentRepo.count());
             }
             case "tenant" -> {
-                stats.put("nextRentDue", rentUploadRepo.findNextRentDueByTenantEmail(email).orElse(LocalDate.parse("N/A")));
+                Optional<Date> nextDueOpt = rentUploadRepo.findNextRentDueByTenant(email);
+                stats.put("nextRentDue", nextDueOpt.map(Date::toString).orElse("N/A"));
                 stats.put("maintenanceRequests", maintenanceRepo.countByTenantEmail(email));
             }
             case "buyer" -> {

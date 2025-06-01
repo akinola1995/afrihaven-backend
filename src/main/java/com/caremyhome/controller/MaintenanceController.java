@@ -1,10 +1,12 @@
 package com.caremyhome.controller;
 
-import com.caremyhome.model.MaintenanceComment;
 import com.caremyhome.model.MaintenanceRequest;
+import com.caremyhome.model.Property;
 import com.caremyhome.repository.MaintenanceRequestRepository;
+import com.caremyhome.repository.PropertyRepository;
 import com.caremyhome.service.MaintenanceService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/maintenance")
 public class MaintenanceController {
+    @Autowired
+    private PropertyRepository propertyRepository;
     private final MaintenanceService service;
 
     public MaintenanceController(MaintenanceService service) {
@@ -31,27 +35,29 @@ public class MaintenanceController {
                         "id", req.getId(),
                         "tenantEmail", req.getTenantEmail(),
                         "tenantName", req.getTenantName(),
-                        "propertyId", req.getPropertyId(),
+                        "propertyId", req.getProperty() != null ? req.getProperty().getId() : null, // <- HERE
                         "issue", req.getIssue(),
                         "urgency", req.getUrgency(),
                         "status", req.getStatus(),
                         "createdAt", req.getCreatedAt(),
                         "comments", req.getComments() == null ? new ArrayList<>() :
                                 req.getComments().stream().map(c -> Map.of(
-                                        "from", c.getFrom(),
+                                        "from", c.getFromUser(),
                                         "text", c.getText(),
                                         "date", c.getDate()
                                 )).collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
     }
-
     // POST /api/maintenance
     @PostMapping
     public ResponseEntity<?> createRequest(@RequestBody Map<String, Object> payload) {
         try {
             MaintenanceRequest req = new MaintenanceRequest();
-            req.setPropertyId(UUID.fromString((String) payload.get("propertyId")));
+            // Get Property by id, set it as relationship!
+            Property property = propertyRepository.findById(UUID.fromString((String) payload.get("propertyId")))
+                    .orElseThrow(() -> new RuntimeException("Property not found"));
+            req.setProperty(property);
             req.setTenantEmail((String) payload.get("tenantEmail"));
             req.setTenantName((String) payload.get("tenantName"));
             req.setIssue((String) payload.get("issue"));
@@ -86,7 +92,7 @@ public class MaintenanceController {
             MaintenanceRequest req = service.addComment(id, from, text);
             return ResponseEntity.ok(Map.of(
                     "comments", req.getComments().stream().map(c -> Map.of(
-                            "from", c.getFrom(),
+                            "from", c.getFromUser(),
                             "text", c.getText(),
                             "date", c.getDate()
                     )).collect(Collectors.toList())

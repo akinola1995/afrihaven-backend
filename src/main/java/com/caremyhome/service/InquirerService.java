@@ -14,7 +14,7 @@ public class InquirerService {
     private InquiryRepository inquiryRepository;
 
     public List<Map<String, Object>> getInquiriesByEmail(String email) {
-        return inquiryRepository.findByFromOrderByCreatedAtDesc(email)
+        return inquiryRepository.findByFromUserOrderByCreatedAtDesc(email)
                 .stream()
                 .map(inq -> {
                     Map<String, Object> map = new HashMap<>();

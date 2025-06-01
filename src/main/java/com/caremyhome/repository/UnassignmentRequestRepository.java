@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UnassignmentRequestRepository extends JpaRepository<UnassignmentRequest, UUID> {
-    List<UnassignmentRequest> findByOwner(UUID ownerId);
+
     List<UnassignmentRequest> findByOwnerEmail(String ownerEmail);
     List<UnassignmentRequest> findByOwner(User owner);
 }

@@ -9,14 +9,14 @@ import lombok.Setter;
 @Setter
 @Embeddable
 public class Comment {
-    private String from;
+    private String fromUser;
     private String text;
     private LocalDateTime date;
 
     public Comment() {}
 
     public Comment(String from, String text) {
-        this.from = from;
+        this.fromUser = fromUser;
         this.text = text;
         this.date = LocalDateTime.now();
     }

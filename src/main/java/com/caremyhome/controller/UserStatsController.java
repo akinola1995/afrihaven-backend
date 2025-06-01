@@ -22,7 +22,7 @@ public class UserStatsController {
     @Autowired
     private InquiryRepository inquiryRepo;
 
-    @GetMapping("/stats")
+    @GetMapping("/statues")
     public UserStatsDTO getUserStats() {
         long tenants = userRepo.countByRole(User.Role.TENANT);
         long agents = userRepo.countByRole(User.Role.AGENT);
