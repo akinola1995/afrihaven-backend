@@ -1,5 +1,6 @@
 package com.caremyhome.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ public class User {
     private UUID id;
 
     @Column(nullable = false)
+    @JsonAlias({"fullName"})
     private String name;
 
     @Column(unique = true, nullable = false)

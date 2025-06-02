@@ -6,6 +6,7 @@ import java.util.Map;
 
 @Data
 public class AgentDashboardResponseDTO {
+    private String name;
     private List<Map<String, Object>> properties;
     private List<Map<String, Object>> assignedTenants;
     private List<Map<String, Object>> assignmentHistory;

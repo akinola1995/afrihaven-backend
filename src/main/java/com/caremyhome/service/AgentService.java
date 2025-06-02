@@ -42,6 +42,7 @@ public class AgentService {
         }
 
         AgentDashboardResponseDTO dto = new AgentDashboardResponseDTO();
+        dto.setName(agent.getName());
         // ... build your DTO as you have it ...
         return dto;
     }

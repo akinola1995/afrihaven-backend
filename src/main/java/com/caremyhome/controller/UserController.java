@@ -71,28 +71,52 @@ public class UserController {
         }
     }
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (userRepository.findByEmail(user.getEmail()) != null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Email already registered"));
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> form) {
+        String email = form.get("email");
+        if (userRepository.existsByEmail(email)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "Email already registered"));
         }
 
-        // Hash the password!
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String name = form.getOrDefault("fullName", form.getOrDefault("name", "User"));
+        String phone = form.getOrDefault("phone", "");
+        String password = form.get("password");
 
-        // Set default role if not provided
-        if (user.getRole() == null) {
-            user.setRole(User.Role.INQUIRER); // Or whatever your default is
+        // --- Require role ---
+        String roleString = form.get("role");
+        if (roleString == null || roleString.trim().isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "No role selected. Please select a role."));
         }
+
+        // --- Validate role ---
+        User.Role role;
+        try {
+            role = User.Role.valueOf(roleString.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "Invalid role selected. Please choose a valid role."));
+        }
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
 
         User saved = userRepository.save(user);
 
-        // Send minimal safe response for frontend
         return ResponseEntity.ok(Map.of(
                 "email", saved.getEmail(),
-                "role", saved.getRole(),
+                "role", saved.getRole().name(),
                 "name", saved.getName()
         ));
     }
+
     }
 
 

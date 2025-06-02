@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db.rouprefnxlxzjhwfhbjp.supabase.co:5432/postgres
+    username: postgres
+    password: DavyAbyEvy500!
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: akinolaolotu1995@gmail.com
+    password: gm23876165gm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+server:
+  port: 8080
+
+afrihaven:
+  uploads:
+    dir: uploads
+
+
