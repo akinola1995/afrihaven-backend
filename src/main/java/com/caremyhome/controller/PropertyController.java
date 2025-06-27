@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,8 @@ public class PropertyController {
     @Autowired private PropertyService propertyService;
     @Autowired private PropertyRepository propertyRepo;
     @Autowired private UserRepository userRepo;
+    @Autowired
+    private InquiryRepository inquiryRepo;
 
     // For simple JSON requests (can keep for API/testing)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -165,6 +168,54 @@ public class PropertyController {
         }).toList();
 
         return ResponseEntity.ok(result);
+    }
+    // 1. GET property details by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPropertyById(@PathVariable UUID id) {
+        Optional<Property> propertyOpt = propertyRepo.findById(id);
+        if (propertyOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Property not found"));
+        }
+        Property prop = propertyOpt.get();
+        // You can use a PropertyDTO or map it directly for now
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", prop.getId());
+        map.put("title", prop.getTitle());
+        map.put("description", prop.getDescription());
+        map.put("price", prop.getPrice());
+        map.put("bedrooms", prop.getBedrooms());
+        map.put("city", prop.getCity());
+        map.put("state", prop.getState());
+        map.put("country", prop.getCountry());
+        map.put("type", prop.getType());
+        map.put("images", prop.getImages()); // Should be a list of URLs/paths
+        // Add any other fields you need for details view
+
+        return ResponseEntity.ok(map);
+    }
+
+    // 2. POST an inquiry for a property
+    @PostMapping("/{id}/inquiry")
+    public ResponseEntity<?> submitInquiry(@PathVariable UUID id, @RequestBody Map<String, Object> body) {
+        Optional<Property> propertyOpt = propertyRepo.findById(id);
+        if (propertyOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Property not found"));
+        }
+        Property property = propertyOpt.get();
+
+        Inquiry inquiry = new Inquiry();
+        inquiry.setProperty(property);
+        inquiry.setName((String) body.getOrDefault("name", ""));
+        inquiry.setEmail((String) body.getOrDefault("email", ""));
+        inquiry.setPhone((String) body.getOrDefault("phone", ""));
+        inquiry.setMessage((String) body.getOrDefault("message", ""));
+        inquiry.setCreatedAt(LocalDateTime.now());
+        // If your Inquiry model has status/submittedAt, set it here
+
+        // Save using your InquiryRepository (inject if not already)
+        inquiryRepo.save(inquiry);
+
+        return ResponseEntity.ok(Map.of("status", "success"));
     }
 }
 

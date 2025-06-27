@@ -19,6 +19,7 @@ public interface PropertyTenantAssignmentRepository extends JpaRepository<Proper
     List<PropertyTenantAssignment> findByPropertyAssignedAgent(User agent);
 
     List<PropertyTenantAssignment> findByPropertyOwnerAndStatus(User owner, String status);
+    boolean existsByTenantAndPropertyAndStatus(User tenant, Property property, String status);
 
     List<PropertyTenantAssignment> findByPropertyId(UUID propertyId);
 

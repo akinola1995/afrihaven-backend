@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class PropertyDTO {
     private String title;
+    private String address;
     private String description;
     private String type; // rent, sale, shortlet, vacation
     private String propertyType;

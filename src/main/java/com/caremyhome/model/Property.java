@@ -56,22 +56,22 @@ public class Property {
     @Column(nullable = false)
     private int bedrooms;
 
-    @Column(nullable = false)
+
     private String status; // e.g., "Available", "Rented", "Sold"
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
+
     private String unit;
 
-    @Column(nullable = false)
+
     private double rent;
 
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
+
     private LocalDate dueDate;
 
     @ManyToOne
@@ -96,7 +96,7 @@ public class Property {
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
     private List<RentUpload> rentUploads;
 
-    @Column(nullable = false)
+
     private String location;
 
     // Store video URL/path (optional)

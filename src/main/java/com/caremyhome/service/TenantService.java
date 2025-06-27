@@ -30,14 +30,12 @@ public class TenantService {
 
         User tenant = tenantOpt.get();
 
-        // Find the current active assignment for this tenant
         PropertyTenantAssignment assignment = assignmentRepo
                 .findFirstByTenantAndStatusOrderByAssignedAtDesc(tenant, "Active")
                 .orElse(null);
 
         Property property = assignment != null ? assignment.getProperty() : null;
 
-        // Maintenance requests for this tenant (OPTIONAL: filter by property)
         List<Map<String, Object>> maintenance = maintenanceRepo
                 .findByTenantEmailOrderByCreatedAtDesc(email)
                 .stream().map(req -> {
@@ -50,15 +48,18 @@ public class TenantService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("name", tenant.getName());
+
         if (property != null) {
-            result.put("property", Map.of(
-                    "id", property.getId(),
-                    "title", property.getTitle(),
-                    "unit", assignment.getUnit(),
-                    "location", property.getCity() + ", " + property.getState(),
-                    "rent", property.getRent(),
-                    "dueDate", property.getDueDate()
-            ));
+            Map<String, Object> propMap = new HashMap<>();
+            propMap.put("id", property.getId());
+            propMap.put("title", property.getTitle());
+            propMap.put("unit", assignment != null ? assignment.getUnit() : null);
+            String city = property.getCity() != null ? property.getCity() : "";
+            String state = property.getState() != null ? property.getState() : "";
+            propMap.put("location", city + (state.isEmpty() ? "" : ", " + state));
+            propMap.put("rent", property.getRent());
+            propMap.put("dueDate", property.getDueDate());
+            result.put("property", propMap);
         } else {
             result.put("property", null);
         }
@@ -66,6 +67,7 @@ public class TenantService {
 
         return result;
     }
+
     public List<Map<String, Object>> getTenantDocuments(String email) {
         return documentRepo.findByTenantEmailOrderByUploadedAtDesc(email).stream()
                 .map(doc -> {

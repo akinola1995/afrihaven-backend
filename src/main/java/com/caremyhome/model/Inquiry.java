@@ -43,4 +43,6 @@ public class Inquiry {
 
     @Column(nullable = false)
     private Instant date;
+
+    private String email;
 }
