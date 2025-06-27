@@ -1,56 +1,107 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@Table(name = "properties")
+@Data
+@NoArgsConstructor
 public class Property {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(length = 2000)
     private String description;
-    private String type; // RENT, SALE, SHORTLET, VACATION
-    private String state;
+
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
     private String city;
-    private String propertyType;
-    private int price;
-    private int bedrooms;
+
+    @Column(nullable = false)
     private String country;
-    private String imageUrl;
+
+    @Column(nullable = false)
+    private String state;
+
+    private String propertyType;
+
+    // --- THIS IS ALL YOU NEED FOR MULTIPLE IMAGES ---
+    @ElementCollection
+    @CollectionTable(name = "property_images", joinColumns = @JoinColumn(name = "property_id"))
+    @Column(name = "image_url")
+    private List<String> images = new ArrayList<>();
+
+    // If you want, you can have a 'mainImage' field for convenience (optional):
+    // private String mainImage;
+
+    @Column(nullable = false)
+    private double price;
+
+    @Column(nullable = false)
+    private int bedrooms;
+
+
+    private String status; // e.g., "Available", "Rented", "Sold"
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+
     private String unit;
-    private Double rent;
-    private LocalDate nextDueDate;
-    private boolean reported = false;
-    private boolean saved = false;
 
-    private String videoUrl;
 
-    private LocalDateTime createdAt;
+    private double rent;
 
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    @Column(nullable = false)
+    private String type;
 
+
+    private LocalDate dueDate;
 
     @ManyToOne
+    @JoinColumn(name = "owner_id", columnDefinition = "uuid")
     private User owner;
 
     @ManyToOne
-    private User agent;
+    @JoinColumn(name = "agent_id", columnDefinition = "uuid")
+    private User assignedAgent;
+
+    private String ownerEmail;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
-    private List<MaintenanceRequest> maintenanceRequests = new ArrayList<>();
+    private List<PropertyTenantAssignment> assignments;
 
-    // Getters and setters
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
+    private List<MaintenanceRequest> maintenanceRequests;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
+    private List<Inquiry> inquiries;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
+    private List<RentUpload> rentUploads;
+
+
+    private String location;
+
+    // Store video URL/path (optional)
+    private String videoUrl;
+
+    public LocalDate nextDueDate;
 }
+

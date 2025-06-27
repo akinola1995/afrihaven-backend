@@ -2,6 +2,7 @@ package com.caremyhome.model;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,41 +11,49 @@ import java.util.UUID;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "maintenance_requests")
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class MaintenanceRequest {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
-    private String tenant;
-    private String tenantName;
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = false)
+    private Property property;   // This is the correct way for JPA!
+
+    @Column(nullable = false)
     private String tenantEmail;
-    @ManyToOne
-    @JoinColumn(name = "property_id")
-    private Property property;
+
+    @Column(nullable = false)
+    private String tenantName;
+
+    @Column(nullable = false)
     private String issue;
+
+    @Column(nullable = false)
     private String urgency;
-    private String status;
-    @ManyToOne
-    private User agent;
 
+    @Column(nullable = false)
+    private String status = "Pending";
 
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
 
-    @ElementCollection
-    @CollectionTable(name = "maintenance_comments", joinColumns = @JoinColumn(name = "request_id"))
-    private List<MaintenanceComment> comments = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "maintenance_comments", joinColumns = @JoinColumn(name = "maintenance_id"))
+    private List<Comment> comments = new ArrayList<>();
 
-    @PrePersist
-    public void init() {
-        this.createdAt = LocalDateTime.now();
-        this.status = "Pending";
+    @Embeddable
+    @Data
+    @NoArgsConstructor
+    public static class Comment {
+        @Column(nullable = false)
+        private String fromUser;
+        @Column(nullable = false, columnDefinition = "TEXT")
+        private String text;
+        @Column(nullable = false)
+        private Instant date = Instant.now();
     }
-
-    // Getters and Setters
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
-    List<Message> findByToEmailOrderBySentAtDesc(String toEmail);
-    List<Message> findByFromEmailOrderBySentAtDesc(String fromEmail);
+    List<Message> findByToEmailOrderBySentAtDesc(String toEmail);     // Inbox
+    List<Message> findByFromEmailOrderBySentAtDesc(String fromEmail); // Sent
 }
-

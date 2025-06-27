@@ -11,11 +11,15 @@ import java.util.List;
 
 public interface TenantAssignmentRepository extends JpaRepository<TenantAssignment, UUID> {
 
-    List<TenantAssignment> findByPropertyId(String propertyId);
 
-//    @Query("SELECT t FROM TenantAssignment t WHERE t.owner.id = :ownerId")
-//    List<TenantAssignment> findByOwnerId(@Param("ownerId") UUID ownerId);
-List<TenantAssignment> findByOwner_Id(UUID id);
+//    List<TenantAssignment> findByAgentEmailAndActiveTrue(String agentEmail);
+//    List<TenantAssignment> findByAgentEmail(String agentEmail);
+//    List<TenantAssignment> findByOwnerEmail(String ownerEmail);
+//    List<TenantAssignment> findByPropertyId(String propertyId);
+//
+////    @Query("SELECT t FROM TenantAssignment t WHERE t.owner.id = :ownerId")
+////    List<TenantAssignment> findByOwnerId(@Param("ownerId") UUID ownerId);
+//List<TenantAssignment> findByOwner_Id(UUID id);
 
     @Query("SELECT t FROM TenantAssignment t WHERE t.agentEmail = :email AND t.active = true")
     List<TenantAssignment> findActiveByAgentEmail(String email);

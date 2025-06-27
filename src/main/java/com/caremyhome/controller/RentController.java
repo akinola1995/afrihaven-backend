@@ -1,8 +1,7 @@
 package com.caremyhome.controller;
 
-import com.caremyhome.dto.RentDTO;
-import com.caremyhome.service.RentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.caremyhome.dto.RentStatusDto;
+import com.caremyhome.service.RentUploadService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,22 +9,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/rents")
 public class RentController {
+    private final RentUploadService rentUploadService;
 
-    @Autowired
-    private RentService rentService;
+    public RentController(RentUploadService rentUploadService) {
+        this.rentUploadService = rentUploadService;
+    }
 
     @GetMapping("/{propertyId}")
-    public List<RentDTO> getRentsByProperty(@PathVariable UUID propertyId) {
-        return rentService.getRentsForProperty(propertyId);
+    public ResponseEntity<List<RentStatusDto>> getRents(@PathVariable UUID propertyId) {
+        return ResponseEntity.ok(rentUploadService.getRentStatusByProperty(propertyId));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateRentStatus(@PathVariable UUID id, @RequestBody Map<String, String> body) {
-        rentService.updateRentStatus(id, body.get("status"));
+    public ResponseEntity<?> updateRentStatus(@PathVariable UUID id, @RequestBody Map<String, String> req) {
+        String status = req.get("status");
+        rentUploadService.updateRentStatus(id, status);
         return ResponseEntity.ok().build();
     }
 }
-

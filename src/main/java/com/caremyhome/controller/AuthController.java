@@ -1,93 +1,58 @@
 // src/main/java/com/caremyhome/controller/AuthController.java
 package com.caremyhome.controller;
-import com.caremyhome.service.EmailService;
-import org.springframework.mail.SimpleMailMessage;
-
-import com.caremyhome.dto.AuthRequest;
-import com.caremyhome.dto.AuthResponse;
-import com.caremyhome.dto.RegisterDTO;
-import com.caremyhome.dto.UserDTO;
+import com.caremyhome.service.AuthService;
 import com.caremyhome.model.User;
-import com.caremyhome.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private EmailService emailService;
-
-
-    private final PasswordEncoder passwordEncoder;
-
-    public AuthController(PasswordEncoder passwordEncoder, UserRepository userRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-    }
+    private AuthService authService;
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request) {
-        User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
-        if (user != null) {
-            return new AuthResponse(user.getEmail(), user.getRole().toString(), "success");
-        } else {
-            return new AuthResponse(null, null, "failure");
-        }
+    public Map<String, Object> login(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String password = body.get("password");
+        return authService.authenticate(email, password)
+                .map(user -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("message", "success");
+                    map.put("role", user.getRole());
+                    map.put("email", user.getEmail());
+                    map.put("name", user.getName());
+                    return map;
+                })
+                .orElseGet(() -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("message", "failure");
+                    return map;
+                });
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterDTO dto) {
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email already registered");
+    public Map<String, Object> register(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String password = payload.get("password");
+        String role = payload.getOrDefault("role", "Tenant");
+        String name = payload.getOrDefault("name", "User");
+
+        if (authService.existsByEmail(email)) {
+            return Map.of("message", "exists");
         }
-
-        User user = new User();
-        user.setEmail(dto.getEmail());
-        user.setFullName(dto.getName());
-        user.setPhone(dto.getPhone());
-        user.setRole(dto.getRole());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully");
+        User user = authService.register(email, password, role, name);
+        return Map.of(
+                "message", "success",
+                "role", user.getRole(),
+                "email", user.getEmail(),
+                "name", user.getName()
+        );
     }
-
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
-        User user = new User();
-        user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword())); // Always hash
-        user.setPhone(dto.getPhone());
-        user.setRole(dto.getRole());
-
-        userRepository.save(user);
-
-        // Simulate sending email
-        emailService.sendWelcomeEmail(dto.getEmail(), dto.getFullName());
-
-        return ResponseEntity.ok(UserDTO.fromEntity(user));
-    }
-
-
-//    public void sendWelcomeEmail(String to, String name) {
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(to);
-//        message.setSubject("Welcome to AfriHaven");
-//        message.setText("Dear " + name + ",\n\nWelcome to AfriHaven! We're excited to have you.\n\nCheers,\nAfriHaven Team");
-//        mailSender.send(message);
-//    }
-
 }

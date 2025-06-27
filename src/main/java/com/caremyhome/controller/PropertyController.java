@@ -21,133 +21,67 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+
 
 @RestController
 @RequestMapping("/api/properties")
 public class PropertyController {
-
+    @Autowired private PropertyService propertyService;
+    @Autowired private PropertyRepository propertyRepo;
+    @Autowired private UserRepository userRepo;
     @Autowired
-    private PropertyRepository propertyRepository;
+    private InquiryRepository inquiryRepo;
 
-    @Autowired
-    InquiryRepository inquiryRepository;
-
-    @Autowired
-    UserRepository userRepository;
-    private final PropertyService service;
-
-    public PropertyController(PropertyService service) {
-        this.service = service;
+    // For simple JSON requests (can keep for API/testing)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Property createProperty(@RequestBody PropertyDTO dto) {
+        return propertyService.createProperty(dto);
     }
 
-    // PropertyController.java
-    @GetMapping("/properties")
-    public List<Property> getPropertiesByType(@RequestParam(required = false) String type) {
-        if (type != null) {
-            return propertyRepository.findByTypeIgnoreCase(type);
-        }
-        return propertyRepository.findAll();
-    }
-
-
-    @GetMapping
-    public ResponseEntity<List<Property>> getAllProperties(@RequestParam(required = false) String type) {
-        List<Property> properties;
-
-        if (type != null && !type.isBlank()) {
-            properties = propertyRepository.findByTypeIgnoreCase(type);
-        } else {
-            properties = propertyRepository.findAll();
-        }
-
-        return ResponseEntity.ok(properties);
-    }
-
+    // For multipart/form-data (matches your new AddProperty UI)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addProperty(
-            @RequestPart("property") PropertyDTO dto,
-            @RequestPart(value = "images", required = false) MultipartFile[] images,
+    public ResponseEntity<?> uploadProperty(
+            @RequestPart("property") PropertyDTO propertyDTO,
+            @RequestPart("images") List<MultipartFile> images,
             @RequestPart(value = "video", required = false) MultipartFile video
-    ) throws IOException {
-        Optional<User> ownerOpt = userRepository.findByEmail(dto.getOwnerEmail());
-        if (ownerOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid owner email");
+    ) {
+        try {
+            Property property = propertyService.createPropertyWithMedia(propertyDTO, images, video);
+            return ResponseEntity.ok(property);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        Property property = new Property();
-        property.setTitle(dto.getTitle());
-        property.setDescription(dto.getDescription());
-        property.setPrice(dto.getPrice());
-        property.setType(dto.getType());
-        property.setPropertyType(dto.getPropertyType());
-        property.setBedrooms(dto.getBedrooms());
-        property.setState(dto.getState());
-        property.setCity(dto.getCity());
-        property.setCountry(dto.getCountry());
-        property.setOwner(ownerOpt.get());
-
-        // Save image files
-        if (images != null && images.length > 0) {
-            List<String> imagePaths = new ArrayList<>();
-            for (MultipartFile file : images) {
-                String savedPath = saveFile(file);  // Save and return relative path
-                imagePaths.add(savedPath);
-            }
-            property.setImageUrl(String.join(",", imagePaths));
-        }
-
-        // Save video
-        if (video != null && !video.isEmpty()) {
-            String videoPath = saveFile(video);
-            property.setVideoUrl(videoPath);
-        }
-
-        propertyRepository.save(property);
-        return ResponseEntity.ok("Property created");
     }
 
-    private final String uploadDir = "uploads/";
+    // Your GET endpoint as before, no change needed.
+    @GetMapping
+    public List<Map<String, Object>> getAllProperties(@RequestParam(required = false) String type) {
+        List<Property> list = (type != null && !type.isEmpty())
+                ? propertyRepo.findByTypeIgnoreCase(type)
+                : propertyRepo.findAll();
 
-    private String saveFile(MultipartFile file) throws IOException {
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
-
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path path = Paths.get(uploadDir, fileName);
-        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        return path.toString();
+        return list.stream().map(prop -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", prop.getId());
+            map.put("title", prop.getTitle());
+            map.put("description", prop.getDescription());
+            map.put("price", prop.getPrice());
+            map.put("bedrooms", prop.getBedrooms());
+            map.put("city", prop.getCity());
+            map.put("state", prop.getState());
+            map.put("country", prop.getCountry());
+            map.put("type", prop.getType());
+            map.put("images", prop.getImages());
+            return map;
+        }).toList();
     }
-
-
-//    @PostMapping
-//    public Property create(@RequestBody Property entity) {
-//        return service.save(entity);
-//    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        service.delete(id);
-    }
-
-    @GetMapping("/{id}")
-    public Optional<Property> getPropertyById(@PathVariable UUID id) {
-        return propertyRepository.findById(id);
-    }
-
-    @PostMapping("/{id}/inquiry")
-    public Inquiry submitInquiry(@PathVariable UUID id, @RequestBody Inquiry inquiry) {
-        Property property = propertyRepository.findById(id).orElseThrow();
-        inquiry.setProperty(property);
-        return inquiryRepository.save(inquiry);
-    }
-
 
     @GetMapping("/search")
-    public List<Property> searchProperties(
+    public List<Map<String, Object>> searchProperties(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String propertyType,
             @RequestParam(required = false) String minPrice,
@@ -156,26 +90,132 @@ public class PropertyController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String state
     ) {
-        return propertyRepository.findAll().stream()
-                .filter(p -> type == null || p.getType().equalsIgnoreCase(type))
-                .filter(p -> propertyType == null || p.getPropertyType().equalsIgnoreCase(propertyType))
-                .filter(p -> minPrice == null || p.getPrice() >= Integer.parseInt(minPrice))
-                .filter(p -> maxPrice == null || p.getPrice() <= Integer.parseInt(maxPrice))
-                .filter(p -> bedrooms == null || p.getBedrooms() == Integer.parseInt(bedrooms))
-                .filter(p -> country == null || p.getCountry().equalsIgnoreCase(country))
-                .filter(p -> state == null || p.getState().equalsIgnoreCase(state))
-                .toList();
+        List<Property> results = propertyRepo.findAll();
+        // Filter in memory, or use JPA Criteria for production scale
+        return results.stream()
+                .filter(p -> type == null || type.isEmpty() || p.getType().equalsIgnoreCase(type))
+                .filter(p -> propertyType == null || propertyType.isEmpty() ||
+                        (p.getPropertyType() != null && p.getPropertyType().equalsIgnoreCase(propertyType)))
+                .filter(p -> minPrice == null || minPrice.isEmpty() || p.getPrice() >= Double.parseDouble(minPrice))
+                .filter(p -> maxPrice == null || maxPrice.isEmpty() || p.getPrice() <= Double.parseDouble(maxPrice))
+                .filter(p -> bedrooms == null || bedrooms.isEmpty() || p.getBedrooms() == Integer.parseInt(bedrooms))
+                .filter(p -> country == null || country.isEmpty() || p.getCountry().equalsIgnoreCase(country))
+                .filter(p -> state == null || state.isEmpty() || p.getState().equalsIgnoreCase(state))
+                .map(p -> Map.of(
+                        "id", p.getId(),
+                        "title", p.getTitle(),
+                        "description", p.getDescription(),
+                        "price", p.getPrice(),
+                        "bedrooms", p.getBedrooms(),
+                        "country", p.getCountry(),
+                        "state", p.getState(),
+                        "type", p.getType(),
+                        "images", p.getImages()
+                ))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/owner/{email}")
-    public ResponseEntity<List<Property>> getPropertiesByOwnerEmail(@PathVariable String email) {
-        Optional<User> ownerOpt = userRepository.findByEmail(email);
+    public ResponseEntity<List<Map<String, Object>>> getPropertiesByOwner(@PathVariable String email) {
+        Optional<User> ownerOpt = userRepo.findByEmail(email);
         if (ownerOpt.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
-        List<Property> properties = propertyRepository.findByOwner(ownerOpt.get());
-        return ResponseEntity.ok(properties);
+        List<Property> properties = propertyRepo.findByOwner(ownerOpt.get());
+
+        // Map to frontend-friendly output
+        List<Map<String, Object>> result = properties.stream().map(prop -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", prop.getId());
+            map.put("title", prop.getTitle());
+            map.put("description", prop.getDescription());
+            map.put("price", prop.getPrice());
+            map.put("bedrooms", prop.getBedrooms());
+            map.put("city", prop.getCity());
+            map.put("state", prop.getState());
+            map.put("country", prop.getCountry());
+            map.put("type", prop.getType());
+            map.put("images", prop.getImages());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(result);
     }
 
+    // Get all properties managed by an agent (by email)
+    @GetMapping("/agent/{email}")
+    public ResponseEntity<List<Map<String, Object>>> getPropertiesByAgent(@PathVariable String email) {
+        Optional<User> agentOpt = userRepo.findByEmail(email);
+        if (agentOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Property> properties = propertyRepo.findByAssignedAgent(agentOpt.get());
 
+        // Map to frontend-friendly output
+        List<Map<String, Object>> result = properties.stream().map(prop -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", prop.getId());
+            map.put("title", prop.getTitle());
+            map.put("description", prop.getDescription());
+            map.put("price", prop.getPrice());
+            map.put("bedrooms", prop.getBedrooms());
+            map.put("city", prop.getCity());
+            map.put("state", prop.getState());
+            map.put("country", prop.getCountry());
+            map.put("type", prop.getType());
+            map.put("images", prop.getImages());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(result);
+    }
+    // 1. GET property details by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPropertyById(@PathVariable UUID id) {
+        Optional<Property> propertyOpt = propertyRepo.findById(id);
+        if (propertyOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Property not found"));
+        }
+        Property prop = propertyOpt.get();
+        // You can use a PropertyDTO or map it directly for now
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", prop.getId());
+        map.put("title", prop.getTitle());
+        map.put("description", prop.getDescription());
+        map.put("price", prop.getPrice());
+        map.put("bedrooms", prop.getBedrooms());
+        map.put("city", prop.getCity());
+        map.put("state", prop.getState());
+        map.put("country", prop.getCountry());
+        map.put("type", prop.getType());
+        map.put("images", prop.getImages()); // Should be a list of URLs/paths
+        // Add any other fields you need for details view
+
+        return ResponseEntity.ok(map);
+    }
+
+    // 2. POST an inquiry for a property
+    @PostMapping("/{id}/inquiry")
+    public ResponseEntity<?> submitInquiry(@PathVariable UUID id, @RequestBody Map<String, Object> body) {
+        Optional<Property> propertyOpt = propertyRepo.findById(id);
+        if (propertyOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Property not found"));
+        }
+        Property property = propertyOpt.get();
+
+        Inquiry inquiry = new Inquiry();
+        inquiry.setProperty(property);
+        inquiry.setName((String) body.getOrDefault("name", ""));
+        inquiry.setEmail((String) body.getOrDefault("email", ""));
+        inquiry.setPhone((String) body.getOrDefault("phone", ""));
+        inquiry.setMessage((String) body.getOrDefault("message", ""));
+        inquiry.setCreatedAt(LocalDateTime.now());
+        // If your Inquiry model has status/submittedAt, set it here
+
+        // Save using your InquiryRepository (inject if not already)
+        inquiryRepo.save(inquiry);
+
+        return ResponseEntity.ok(Map.of("status", "success"));
+    }
 }
+

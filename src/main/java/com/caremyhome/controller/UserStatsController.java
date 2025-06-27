@@ -1,5 +1,6 @@
 package com.caremyhome.controller;
 
+import com.caremyhome.dto.UserStatsDTO;
 import com.caremyhome.model.User;
 import com.caremyhome.repository.InquiryRepository;
 import com.caremyhome.repository.UserRepository;
@@ -17,16 +18,18 @@ public class UserStatsController {
 
     @Autowired
     private UserRepository userRepo;
-    @Autowired private InquiryRepository inquiryRepo;
 
-    @GetMapping("/stats")
-    public Map<String, Integer> getUserCounts() {
-        Map<String, Integer> stats = new HashMap<>();
-        stats.put("tenants", (int) userRepo.countByRole(User.Role.TENANT));
-        stats.put("agents", (int) userRepo.countByRole(User.Role.AGENT));
-        stats.put("owners", (int) userRepo.countByRole(User.Role.OWNER));
-        stats.put("inquiries", (int) inquiryRepo.count());
-        return stats;
+    @Autowired
+    private InquiryRepository inquiryRepo;
+
+    @GetMapping("/statues")
+    public UserStatsDTO getUserStats() {
+        long tenants = userRepo.countByRole(User.Role.TENANT);
+        long agents = userRepo.countByRole(User.Role.AGENT);
+        long owners = userRepo.countByRole(User.Role.OWNER);
+        long inquiries = inquiryRepo.count();
+
+        return new UserStatsDTO(tenants, agents, owners, inquiries);
     }
 }
 

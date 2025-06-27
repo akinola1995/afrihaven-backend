@@ -8,5 +8,4 @@ import java.util.UUID;
 
 public interface RentPaymentRepository extends JpaRepository<RentPayment, UUID> {
 
-    List<RentPayment> findByOwner(UUID ownerId);
 }

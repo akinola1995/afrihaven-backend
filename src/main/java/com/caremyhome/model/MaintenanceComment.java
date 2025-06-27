@@ -21,6 +21,6 @@ public class MaintenanceComment {
     private Date date = new Date();
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    public MaintenanceComment(String from, String text) {
+    public MaintenanceComment(String fromUser, String text) {
     }
 }

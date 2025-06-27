@@ -1,18 +1,17 @@
 package com.caremyhome.model;
 
 import com.caremyhome.dto.TenantAssignmentDto;
-
-
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
+@Builder
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class TenantAssignment {
 
     @Id
@@ -22,24 +21,25 @@ public class TenantAssignment {
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    @JoinColumn(name = "owner_id", columnDefinition = "uuid")
     private User owner;
 
+    private String unit;
+    private String tenantEmail;
     private String agentEmail;
 
-    private String propertyId;
     private boolean active = true;
-
     private LocalDateTime assignedAt = LocalDateTime.now();
 
+    @ManyToOne
+    @JoinColumn(name = "property_id", referencedColumnName = "id")
+    private Property property;
+
+    // DTO constructor (optional)
     public TenantAssignment(TenantAssignmentDto dto) {
         this.email = dto.getEmail();
-        this.agentEmail = dto.getAgentEmail(); // set from DTO
-        this.propertyId = dto.getPropertyId().toString();
+        this.agentEmail = dto.getAgentEmail();
+        // Assign property if needed, e.g., using propertyRepo.findById(dto.getPropertyId())
+        // (Don't set propertyId as a separate field!)
     }
-
-    public TenantAssignment() {}
 }
-
-    // Getters & Setters
-

@@ -1,51 +1,48 @@
 package com.caremyhome.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
+@Table(name = "inquiries")
+@Data
+@NoArgsConstructor
 public class Inquiry {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "agent_id")
-    private User agent;
+    @Column(name = "from_user", nullable = false)
+    private String fromUser;
 
+    @Column(nullable = false)
     private String message;
 
-    private String email;
-
-    private String status;
-
-    private LocalDateTime createdAt;
-
-
-
-    @ManyToOne
-    private Property property;
-
-    @PrePersist
-    public void setTimestamp() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
+    // NEW: Add Name (not nullable, since your UI requires it)
+    @Column(nullable = false)
     private String name;
+
+    // NEW: Add Phone (optional, so nullable)
+    @Column
     private String phone;
 
-//    private LocalDateTime submittedAt;
-//
-//
-//    @PrePersist
-//    public void onCreate() {
-//        this.submittedAt = LocalDateTime.now();
-//    }
+    @Column(nullable = false)
+    private String status; // e.g., "Open", "Closed", "In Progress", "Replied"
 
+    @ManyToOne
+    @JoinColumn(name = "property_id")
+    private Property property;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private Instant date;
+
+    private String email;
 }
